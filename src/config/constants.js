@@ -1,27 +1,27 @@
 const fields = [
-    { id: 'author', text: 'Автор' },
-    { id: 'title', text: 'Название' },
-    { id: 'weight', text: 'Вес в упаковке' },
-    { id: 'size', text: 'Размер (ДхШхВ)' },
-    { id: 'formatEdition', text: 'Формат издания' },
-    { id: 'ISBN', text: 'ISBN' },
-    { id: 'vendorCode', text: 'Артикул' },
-    { id: 'numberOfPages', text: 'Количество страниц' },
-    { id: 'coverType', text: 'Тип обложки' },
-    { id: 'paperType', text: 'Тип бумаги' },
-    { id: 'authorOnTheCover', text: 'Автор на обложке' },
-    { id: 'publishingHouse', text: 'Издательство' },
-    { id: 'yearOfIssue', text: 'Год выпуска' },
-    { id: 'language', text: 'Язык издания' },
-    { id: 'series', text: 'Серия' },
-    { id: 'description', text: 'Описание' },
+    { settingId: 'author', text: 'Автор' },
+    { settingId: 'title', text: 'Название' },
+    { settingId: 'weight', text: 'Вес в упаковке' },
+    { settingId: 'size', text: 'Размер (ДхШхВ)' },
+    { settingId: 'formatEdition', text: 'Формат издания' },
+    { settingId: 'ISBN', text: 'ISBN' },
+    { settingId: 'vendorCode', text: 'Артикул' },
+    { settingId: 'numberOfPages', text: 'Количество страниц' },
+    { settingId: 'coverType', text: 'Тип обложки' },
+    { settingId: 'paperType', text: 'Тип бумаги' },
+    { settingId: 'authorOnTheCover', text: 'Автор на обложке' },
+    { settingId: 'publishingHouse', text: 'Издательство' },
+    { settingId: 'yearOfIssue', text: 'Год выпуска' },
+    { settingId: 'language', text: 'Язык издания' },
+    { settingId: 'series', text: 'Серия' },
+    { settingId: 'description', text: 'Описание' },
 ];
 
 const settings = () => {
     return fields.map((field, index) => {
         return {
             ...field,
-            index: index,
+            index: index + 1,
             isPublic: true,
             isShowInTable: false,
             isFilterable: false,
@@ -31,3 +31,4 @@ const settings = () => {
 
 export const DEFAULT_SETTINGS = settings();
 
+export const searchInputTypeNumber = ['weight', 'numberOfPages', 'yearOfIssue'];

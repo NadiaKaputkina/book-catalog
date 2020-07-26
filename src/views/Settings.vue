@@ -1,7 +1,7 @@
 <template>
     <div>
 
-        <div v-if="isLoadSettings">
+        <div class="modal" v-if="isLoadSettings">
             <div class="spinner-border">
                 <p>Loading...</p>
             </div>
@@ -11,6 +11,7 @@
             <div class="">
                 <button class="btn btn-success"
                         v-if="isEditMode"
+                        :disabled="isBtnDisabled"
                         @click.stop="onSave">
                     Сохранить
                 </button>
@@ -27,38 +28,49 @@
                 </button>
             </div>
 
-            <div class="form-row">
-                <div class="col-4">
-                    <p class="text-center">Название свойства</p>
-                </div>
-                <div class="col-2">
-                    <p class="text-center">Публичное</p>
-                </div>
-                <div class="col-2">
-                    <p class="text-center">В таблице</p>
-                </div>
-                <div class="col-2">
-                    <p class="text-center">В фильтре</p>
-                </div>
-            </div>
-
-            <div class="form-row border-bottom" v-for="setting of settings" :key="setting.id">
-                <input type="text" class="form-control col-4"
-                       :readonly="!isEditMode"
-                       v-model="setting.text" />
-                <input type="checkbox" class="checkbox col-2"
-                       :checked="setting.isPublic"
-                       @change="changeChecked($event, setting.id, 'isPublic')"
-                       :disabled="!isEditMode"/>
-                <input type="checkbox" class="checkbox col-2"
-                       :checked="setting.isShowInTable"
-                       @change="changeChecked($event, setting.id, 'isShowInTable')"
-                       :disabled="!isEditMode || !setting.isPublic"/>
-                <input type="checkbox" class="checkbox col-2"
-                       :checked="setting.isFilterable"
-                       @change="changeChecked($event, setting.id, 'isFilterable')"
-                       :disabled="!isEditMode || !setting.isShowInTable"/>
-            </div>
+            <table class="table table-hover">
+                <thead>
+                    <tr class="row">
+                        <th class="col-4 text-center">Название свойства</th>
+                        <th class="col-2 text-center">Публичное</th>
+                        <th class="col-2 text-center">В таблице</th>
+                        <th class="col-2 text-center">В фильтре</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="row" v-for="setting of settings" :key="setting.settingId">
+                        <td class="col-4">
+                            <input type="text" v-if="isEditMode"
+                                   class="form-control"
+                                   v-model="setting.text"/>
+                            <p v-else class="text-left px-3 py-2 mb-0">{{setting.text}}</p>
+                        </td>
+                        <td class="col-2 text-center">
+                            <input type="checkbox"
+                                   :checked="setting.isPublic"
+                                   @change="changeChecked($event, setting.settingId, 'isPublic')"
+                                   :disabled="!isEditMode"/>
+                        </td>
+                        <td class="col-2 text-center">
+                            <input type="checkbox"
+                                   :checked="setting.isShowInTable"
+                                   @change="changeChecked($event, setting.settingId, 'isShowInTable')"
+                                   :disabled="!isEditMode || !setting.isPublic"/>
+                        </td>
+                        <td class="col-2 text-center">
+                            <input type="checkbox"
+                                   :checked="setting.isFilterable"
+                                   @change="changeChecked($event, setting.settingId, 'isFilterable')"
+                                   :disabled="!isEditMode || !setting.isShowInTable"/>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="row">
+                        <td class="col">+</td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
         
     </div>
@@ -93,6 +105,13 @@
             this.getData();
         },
 
+        computed: {
+            isBtnDisabled: function () {
+                console.log(`this.changedSettingId=`, this.changedSettingId);
+                return this.changedSettingId.length == 0;
+            }
+        },
+
         methods: {
             getData() {
                 this.isLoadSettings = true;
@@ -116,9 +135,9 @@
                     .catch(() => console.log('ошибка загрузки настроек'))
             },
 
-            changeChecked(event, id, propName) {
+            changeChecked(event, settingId, propName) {
                 const isChecked = event.target.checked;
-                const index = this.settings.findIndex((el) => el.id === id);
+                const index = this.settings.findIndex((el) => el.settingId === settingId);
 
                 if (isChecked) {
                     this.settings[index][propName] = isChecked;
@@ -140,18 +159,14 @@
                     }
                 }
 
-                this.getChangedSettingId(id, isChecked);
+                this.getChangedSettingId(settingId);
             },
 
-            getChangedSettingId(id, isChecked) {
-                const index = this.changedSettingId.findIndex((el) => el.id === id);
+            getChangedSettingId(settingId) {
+                const index = this.changedSettingId.findIndex((el) => el === settingId);
 
-                if (index < 0 && isChecked) {
-                    this.changedSettingId.push(id);
-                }
-
-                if (index >= 0 && !isChecked) {
-                    this.changedSettingId.splice(index, 1);
+                if (index < 0) {
+                    this.changedSettingId.push(settingId);
                 }
             },
 
@@ -163,7 +178,7 @@
                 this.settings = [];
 
                 this.startSettings.forEach(setting => {
-                    this.settings.push(setting);
+                    return this.settings.push(setting);
                 });
 
                 this.isEditMode = false;
@@ -173,9 +188,9 @@
                 if (this.changedSettingId.length) {
                     let batch = fb.firestore().batch();
 
-                    this.changedSettingId.forEach((id) => {
-                        let ref = fb.firestore().collection('settings').doc(id);
-                        let value = this.settings.find((el) => el.id === id);
+                    this.changedSettingId.forEach((settingId) => {
+                        let ref = fb.firestore().collection('settings').doc(settingId);
+                        let value = this.settings.find((el) => el.settingId === settingId);
 
                         batch.set(ref, value)
                     });
@@ -187,6 +202,8 @@
                             this.isEditMode = false;
                         })
                         .catch(() => console.log('ошибка'))
+                } else {
+                    this.isEditMode = false;
                 }
             },
 
@@ -195,5 +212,7 @@
 </script>
 
 <style scoped>
-
+    .table td {
+        padding: 0;
+    }
 </style>

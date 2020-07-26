@@ -2,16 +2,16 @@
     <div>
 
         <div class="text-right" v-if="isEditMode">
-            <button class="btn btn-success"
-                    @click.stop="onSave">
+            <button class="btn btn-success m-1"
+                    @click="onSave">
                 Сохранить
             </button>
-            <button class="btn btn-danger"
-                    @click.stop="onDelete">
+            <button class="btn btn-danger m-1"
+                    @click="onDelete">
                 Удалить
             </button>
-            <button class="btn btn-warning"
-                    @click.stop="onCancel">
+            <button class="btn btn-warning m-1"
+                    @click="onCancel">
                 Отмена
             </button>
         </div>
@@ -234,6 +234,10 @@
             }
         },
 
+        mounted() {
+            console.log('--ggg---')
+        },
+
         methods: {
             onSave() {
                 this.isEditForm = !this.isEditForm;
@@ -248,7 +252,13 @@
             },
 
             onCancel() {
+                const currentRoute = this.$route.path;
 
+                if(currentRoute == '/new') {
+                    this.$router.push(`/list`);
+                } else {
+                    this.isEditForm = false;
+                }
             }
         }
     }

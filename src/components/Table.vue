@@ -3,21 +3,22 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr class="row">
-                    <th class="col">Автор</th>
-                    <th class="col">Название</th>
-                    <th class="col">Количество страниц</th>
-                    <th class="col">Издательство</th>
-                    <th class="col">Год выпуска</th>
+                    <th class="col" v-for="col of tableColumns" :key="col.settingId">{{col.text}}</th>
+                    <th class="col-1"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr class="row" v-for="(book, index) of books" :key="book.title"
-                    @click="showBookParams(index)">
-                    <td class="col">{{book.author}}</td>
-                    <td class="col">{{book.title}}</td>
-                    <td class="col">{{book.numberOfPages}}</td>
-                    <td class="col">{{book.publishingHouse}}</td>
-                    <td class="col">{{book.yearOfIssue}}</td>
+                <tr class="row" v-for="book of books" :key="book.title"
+                    @click="viewBook(book.index, book.bookId)">
+                    <td class="col" v-for="col of tableColumns" :key="book.title + '_' + col.settingId">
+                        {{book[col.settingId]}}
+                    </td>
+                    <td class="col-1">
+                        <button class="btn btn-info"
+                              @click.stop="editBook(book.index, book.bookId)">
+                            /
+                        </button>
+                    </td>
                 </tr>
             </tbody>
             <tfoot>
@@ -35,12 +36,23 @@
             books: {
                 type: Array,
                 default: () => []
-            }
+            },
+
+            tableColumns: {
+                type: Array,
+                default: () => []
+            },
         },
 
         methods: {
-            showBookParams(index) {
-                this.$router.push(`/list/${index}`);
+            viewBook(bookIndex, bookId) {
+                console.log(bookIndex, bookId);
+                this.$router.push(`/list/${bookIndex}`);
+            },
+
+            editBook(bookIndex, bookId) {
+                console.log(bookIndex, bookId);
+                this.$router.push({path: `/list/${bookIndex}/edit`});
             }
         }
     }

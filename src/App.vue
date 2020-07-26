@@ -2,11 +2,11 @@
     <div id="app">
 
         <header class="card-header">
-            <div id="nav text-left">
-              <router-link to="/list">Каталог</router-link>  |
-              <router-link to="/settings">Настройка</router-link>  |
-              <router-link to="/new">Добавить</router-link>  |
-            </div>
+            <ul class="navbar-nav mr-auto">
+              <router-link class="nav-item" to="/list">Каталог</router-link>
+              <router-link class="nav-item" to="/settings" v-show="isAdmin">Настройка</router-link>
+              <router-link class="nav-item" to="/new" v-show="isAdmin">Добавить</router-link>
+            </ul>
 
             <div class="text-right">
                 <button class="btn btn-info"
@@ -15,13 +15,13 @@
                 </button>
                 <button class="btn btn-info"
                         @click="changeMode">
-                    {{ isAdmin ? 'Выход' : 'Админ' }}
+                    {{ isAdmin ? 'Выход' : 'Вход' }}
                 </button>
             </div>
         </header>
 
         <main class="card-body container">
-          <router-view/>
+          <router-view />
         </main>
 
         <footer class="card-footer">
@@ -32,6 +32,8 @@
 </template>
 
 <script>
+    import fb from 'firebase';
+
   export default {
       data() {
           return {
@@ -39,17 +41,32 @@
           }
       },
 
+      updated() {
+          const user = fb.auth().currentUser;
+          console.log('[App - updated]', user)
+
+          this.isAdmin = !user ? false : true;
+      },
+
       methods: {
           changeMode() {
-              this.isAdmin = !this.isAdmin;
+              if (!this.isAdmin) {
+                  this.$router.push('/login')
+              } else {
+                  fb.auth().signOut()
+                      .then(() => {
+                          this.isAdmin = false;
+                      }).catch((err) => console.log(err))
+              }
           },
 
           exportCatalogToPDF() {
               console.log('exportCatalogToPDF')
           }
-      }
+      },
   }
 </script>
+
 <style>
 
 </style>

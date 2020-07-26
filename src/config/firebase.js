@@ -21,7 +21,7 @@ export const setSettingsDataFormFirebase = () => {
     let batch = fb.firestore().batch();
 
     for (let value of DEFAULT_SETTINGS) {
-        let ref = fb.firestore().collection('settings').doc(value.id);
+        let ref = fb.firestore().collection('settings').doc(value.settingId);
         batch.set(ref, value)
     }
 
