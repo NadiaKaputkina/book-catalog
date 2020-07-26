@@ -16,15 +16,6 @@
             </button>
         </div>
 
-       <!-- <div class="form-row mb-2">
-            <label for="author" class="col-sm-2 col-form-label">Автор</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="author"
-                       :readonly="!isEditMode"
-                       v-model="defaultParams.author" />
-            </div>
-        </div>-->
-
         <div class="form-row mb-2">
             <label for="author" class="col-sm-2 col-form-label">Автор</label>
             <div class="col-sm-10">
@@ -242,7 +233,9 @@
             onSave() {
                 this.isEditForm = !this.isEditForm;
 
-                fb.firestore().collection('catalog').add(this.defaultParams)
+                let newBookRef = fb.firestore().collection('catalog').doc()
+                
+                newBookRef.set(this.defaultParams)
                     .then(() => alert('сохранено'))
                     .catch(() => alert('ошибка'))
             },

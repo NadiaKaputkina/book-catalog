@@ -1,13 +1,13 @@
 <template>
     <div>
 
-        <div class="modal" v-if="isLoadSettings">
+        <div class="modal" v-if="isLoading">
             <div class="spinner-border">
                 <p>Loading...</p>
             </div>
         </div>
 
-        <div class="text-right" v-if="!isLoadSettings">
+        <div class="text-right" v-else>
             <div class="">
                 <button class="btn btn-success"
                         v-if="isEditMode"
@@ -91,7 +91,7 @@
 
         data() {
             return {
-                isLoadSettings: false,
+                isLoading: false,
                 isEditMode: false,
 
                 settings: [],
@@ -114,7 +114,7 @@
 
         methods: {
             getData() {
-                this.isLoadSettings = true;
+                this.isLoading = true;
 
                 fb.firestore().collection('settings').get()
                     .then((querySnapshot) => {
@@ -130,7 +130,7 @@
                         });
 
                         this.startSettings = [...this.settings];
-                        this.isLoadSettings = false;
+                        this.isLoading = false;
                     })
                     .catch(() => console.log('ошибка загрузки настроек'))
             },
