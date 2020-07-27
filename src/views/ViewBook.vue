@@ -6,11 +6,11 @@
             </div>
         </div>
 
-        <div class="text-right" v-else>
-            <div class="...">
-
+        <div class="" v-else>
+            <div class="col-sm-4">
+                <img src="" alt="Обложка книги" class="img-thumbnail">
             </div>
-            <div class="...">
+            <div class="col-sm-8">
                 <h3>{{bookParams.author}}</h3>
                 <h3>{{bookParams.title}}</h3>
 
@@ -29,45 +29,48 @@
     export default {
         name: "ViewBook",
 
-        props: {
-            isPublicParams: {
-                type: Array,
-                default: () => {
-                    return []
-                }
-            }
-        },
-
         data() {
             return {
                 isLoading: false,
 
                 bookParams: null,
+                isPublicParams: [],
             }
         },
 
         mounted() {
-            const bookIndex = this.$route.params.id;
-
-            fb.firestore().collection('settings').where('isPublic', '==', true)
-            .get()
-            .then()
-            
-            fb.firestore().collection('catalog').where('index', '==', bookIndex)
-            .get()
-            .then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    this.bookParams = Object.assign({} , this.bookParams, {...doc});
-                })
-            })
-            .catch((err) => console.log(err))
-
-            this.getBookImages();
+            this.getBookParams();
         },
 
         methods: {
-            getBookImages() {
+            getBookParams() {
+                this.isLoading = true;
 
+                const bookIndex = +this.$route.params.id;
+
+                fb.firestore().collection('settings').where('isPublic', '==', true)
+                    .get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            const settingId = doc.id;
+
+                            this.isPublicParams.push(settingId);
+                        })
+                    })
+                    .catch((err) => console.log(err));
+
+                fb.firestore().collection('catalog').where('index', '==', bookIndex)
+                    .get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            const book = doc.data();
+
+                            this.bookParams = Object.assign({} , this.bookParams, book);
+
+                            this.isLoading = false;
+                        })
+                    })
+                    .catch((err) => console.log(err))
             }
         }
 

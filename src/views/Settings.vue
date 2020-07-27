@@ -38,7 +38,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="row" v-for="setting of settings" :key="setting.settingId">
+                    <tr class="row" v-for="setting of settings" :key="setting.id">
                         <td class="col-4">
                             <input type="text" v-if="isEditMode"
                                    class="form-control"
@@ -48,19 +48,19 @@
                         <td class="col-2 text-center">
                             <input type="checkbox"
                                    :checked="setting.isPublic"
-                                   @change="changeChecked($event, setting.settingId, 'isPublic')"
+                                   @change="changeChecked($event, setting.id, 'isPublic')"
                                    :disabled="!isEditMode"/>
                         </td>
                         <td class="col-2 text-center">
                             <input type="checkbox"
                                    :checked="setting.isShowInTable"
-                                   @change="changeChecked($event, setting.settingId, 'isShowInTable')"
+                                   @change="changeChecked($event, setting.id, 'isShowInTable')"
                                    :disabled="!isEditMode || !setting.isPublic"/>
                         </td>
                         <td class="col-2 text-center">
                             <input type="checkbox"
                                    :checked="setting.isFilterable"
-                                   @change="changeChecked($event, setting.settingId, 'isFilterable')"
+                                   @change="changeChecked($event, setting.id, 'isFilterable')"
                                    :disabled="!isEditMode || !setting.isShowInTable"/>
                         </td>
                     </tr>
@@ -77,17 +77,13 @@
 </template>
 
 <script>
-    import fb from 'firebase';
+    import { getAllDataFromDB, addDocsToDB } from '../js/db.js';
+    import mixin from '../js/mixins.js';
 
     export default {
         name: "Settings",
 
-        props: {
-            isAdmin: {
-                type: Boolean,
-                default: false
-            }
-        },
+        mixins: [mixin],
 
         data() {
             return {
@@ -107,7 +103,6 @@
 
         computed: {
             isBtnDisabled: function () {
-                console.log(`this.changedSettingId=`, this.changedSettingId);
                 return this.changedSettingId.length == 0;
             }
         },
@@ -116,28 +111,21 @@
             getData() {
                 this.isLoading = true;
 
-                fb.firestore().collection('settings').get()
-                    .then((querySnapshot) => {
+                getAllDataFromDB('settings')
+                    .then((result) => {
+                        console.log('kjhkjhkjhjgjgjhg')
+                        this.settings = [...result];
 
-                        querySnapshot.forEach((doc) => {
-                            const data = doc.data();
-
-                            this.settings.push(data);
-                        });
-
-                        this.settings.sort((a, b) => {
-                            return a.index - b.index;
-                        });
+                        this.sortByIndex(this.settings);
 
                         this.startSettings = [...this.settings];
                         this.isLoading = false;
                     })
-                    .catch(() => console.log('ошибка загрузки настроек'))
             },
 
             changeChecked(event, settingId, propName) {
                 const isChecked = event.target.checked;
-                const index = this.settings.findIndex((el) => el.settingId === settingId);
+                const index = this.settings.findIndex((el) => el.id === settingId);
 
                 if (isChecked) {
                     this.settings[index][propName] = isChecked;
@@ -186,22 +174,16 @@
 
             onSave() {
                 if (this.changedSettingId.length) {
-                    let batch = fb.firestore().batch();
-
-                    this.changedSettingId.forEach((settingId) => {
-                        let ref = fb.firestore().collection('settings').doc(settingId);
-                        let value = this.settings.find((el) => el.settingId === settingId);
-
-                        batch.set(ref, value)
+                    let arr = this.settings.filter((setting) => {
+                        return this.changedSettingId.includes(setting.id)
                     });
 
-                    batch.commit()
+                    addDocsToDB('settings', arr)
                         .then(() => {
-                            console.log('настройки сохранены');
                             this.changedSettingId = [];
                             this.isEditMode = false;
-                        })
-                        .catch(() => console.log('ошибка'))
+                        });
+
                 } else {
                     this.isEditMode = false;
                 }

@@ -1,15 +1,15 @@
 <template>
-    <div id="app">
+    <div id="app" class="container-fluid">
 
-        <header class="card-header">
-            <ul class="navbar-nav mr-auto">
-              <router-link class="nav-item" to="/list">Каталог</router-link>
+        <header class="card-header row">
+            <div class="navbar-nav col-sm-6">
+              <router-link class="nav-item active" to="/list">Каталог</router-link>
               <router-link class="nav-item" to="/settings" v-show="isAdmin">Настройка</router-link>
               <router-link class="nav-item" to="/new" v-show="isAdmin">Добавить</router-link>
-            </ul>
+            </div>
 
-            <div class="text-right">
-                <button class="btn btn-info"
+            <div class="col-sm-6 text-right">
+                <button class="btn btn-info mr-2"
                         @click="exportCatalogToPDF">
                     Экспорт в PDF
                 </button>
@@ -24,47 +24,33 @@
           <router-view />
         </main>
 
-        <footer class="card-footer">
-
+        <footer class="card-footer row fixed-bottom">
         </footer>
 
     </div>
 </template>
 
 <script>
-    import fb from 'firebase';
+    import { signOut } from './js/auth.js'
+    import mixin from './js/mixins.js'
 
-  export default {
-      data() {
-          return {
-              isAdmin: false,
-          }
-      },
+    export default {
+        mixins: [mixin],
 
-      updated() {
-          const user = fb.auth().currentUser;
-          console.log('[App - updated]', user)
+        methods: {
+            changeMode() {
+                if (!this.isAdmin) {
+                    this.$router.push('/login')
+                } else {
+                    signOut()
+                }
+            },
 
-          this.isAdmin = !user ? false : true;
-      },
-
-      methods: {
-          changeMode() {
-              if (!this.isAdmin) {
-                  this.$router.push('/login')
-              } else {
-                  fb.auth().signOut()
-                      .then(() => {
-                          this.isAdmin = false;
-                      }).catch((err) => console.log(err))
-              }
-          },
-
-          exportCatalogToPDF() {
-              console.log('exportCatalogToPDF')
-          }
-      },
-  }
+            exportCatalogToPDF() {
+                console.log('exportCatalogToPDF')
+            }
+        },
+    }
 </script>
 
 <style>

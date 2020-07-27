@@ -3,17 +3,17 @@
         <input class="form-control m-1"
                :class="'col-' + colSize"
                v-for="field of filterFields"
-               :key="field.settingId"
-               :type="inputType(field.settingId)"
-               :ref="field.settingId"
+               :key="field.id"
+               :type="inputType(field.id)"
+               :ref="field.id"
                :placeholder="field.text"
-               @input="searchBooks(field.settingId, $event)"
+               @input="searchBooks(field.id, $event)"
         />
     </div>
 </template>
 
 <script>
-    import { searchInputTypeNumber } from '@/config/constants.js'
+    import { INPUT_TYPE_NUMBER } from '../js/constants.js'
 
     export default {
         name: 'Filtering',
@@ -21,14 +21,16 @@
         props: {
             filterFields: {
                 type: Array,
-                default: () => []
+                default: () => {
+                    return []
+                }
             }
         },
 
         computed: {
             inputType: () => {
                 return (settingId) => {
-                    return searchInputTypeNumber.includes(settingId) ? 'number' : 'text';
+                    return INPUT_TYPE_NUMBER.includes(settingId) ? 'number' : 'text';
                 }
             },
 

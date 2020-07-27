@@ -1,33 +1,39 @@
 <template>
-    <div class="card">
+    <div class="card w-50 mx-auto bg-light">
         <div class="card-body">
 
             <input type="email"
                    class="form-control"
+                   :class="{'border-danger': !isValidLogin}"
                    placeholder="Логин"
                    required
-                   v-model="login"/>
+                   v-model="login"
+                   @input="isValidLogin = true"/>
             <p v-if="!isValidLogin">Неправильный логин</p>
 
             <input type="password"
-                   class="form-control"
+                   class="form-control mt-2"
+                   :class="{'border-danger': !isValidPass}"
                    placeholder="Пароль"
                    required
-                   v-model="password"/>
+                   v-model="password"
+                   @input="isValidPass = true"/>
             <p v-if="!isValidPass">Неправильный пароль</p>
 
             <button type="submit"
                     :disabled="isBtnDisabled"
-                    class="btn btn-info"
+                    class="btn btn-info w-100 mt-2"
                     @click="signIn">
                 Войти
             </button>
+
+            <p>Регистрация</p>
         </div>
     </div>
 </template>
 
 <script>
-    import fb from 'firebase';
+    import { signIn } from "../js/auth.js";
 
     export default {
         name: "login",
@@ -42,44 +48,35 @@
             }
         },
 
-        mounted() {
-
-        },
-
         computed: {
-            isBtnDisabled: (vm) => vm.login !== '' && vm.password !== ''
+            isBtnDisabled: (vm) => vm.login === '' || vm.password === ''
         },
 
         methods: {
-            validation(login) {
-                if (!login) {
-                    this.isValidPass = false;
-                    this.password = '';
-                } else {
-                    this.isValidLogin = false;
-                    this.login = '';
-
-                    this.isValidPass = false;
-                    this.password = '';
-                }
-            },
-
             signIn() {
 
-                fb.auth().signInWithEmailAndPassword(this.login, this.password)
+                signIn(this.login, this.password)
                     .then(() => {
                         this.$router.push('/list')
                     })
-                    .catch(function (error) {
+                    .catch((error) => {
                         const errorCode = error.code;
 
-                        if (errorCode === 'auth/wrong-password') {
-                            this.validation(null);
-                        } else {
-                            this.validation(this.login);
+                        switch (errorCode) {
+                            case 'auth/wrong-password':
+                                this.isValidPass = false;
+                                this.password = '';
+
+                                break;
+
+                            default:
+                                this.isValidLogin = false;
+                                this.login = '';
+
+                                this.isValidPass = false;
+                                this.password = '';
                         }
                     });
-
 
             }
         }

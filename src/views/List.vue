@@ -6,6 +6,7 @@
         ></Filtering>
 
         <Table
+            :isAdmin="isAdmin"
             :books="filteredBooksList"
             :table-columns="tableColumns"
         ></Table>
@@ -14,8 +15,10 @@
 
 <script>
 
-  import Filtering from '@/components/Filtering.vue'
-  import Table from '@/components/Table.vue'
+  import Filtering from '../components/Filtering.vue'
+  import Table from '../components/Table.vue'
+
+  import mixin from '../js/mixins.js'
 
   import fb from 'firebase';
 
@@ -26,6 +29,8 @@
           Filtering,
           Table
       },
+
+      mixins: [mixin],
 
       data() {
           return {
@@ -41,8 +46,6 @@
 
       computed: {
           filteredBooksList: function () {
-              console.log(this.filterParams);
-
               return this.booksList;
           }
       },
@@ -109,12 +112,6 @@
               });
 
               this.sortByIndex(this.filterFields)
-          },
-
-          sortByIndex(value) {
-              value.sort((a, b) => {
-                  return a.index - b.index;
-              });
           },
 
           searchBooksByValue(settingId, value) {

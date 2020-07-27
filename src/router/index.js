@@ -6,6 +6,13 @@ Vue.use(VueRouter);
 
 const routes = [
     {
+        path: '/',
+        name: 'Home',
+        redirect: {
+            name: 'Catalog'
+        },
+    },
+    {
         path: '/list',
         name: 'Catalog',
         component: List,
@@ -47,12 +54,5 @@ const router = new VueRouter({
     base: process.env.BASE_URL,
     routes
 });
-
-/*router.beforeEach((to, from, next) => {
-    if (!isAdmin) {
-        if (to.name === 'Settings' || to.name === '') next({name: 'Login'});
-        else next()
-    }
-});*/
 
 export default router
