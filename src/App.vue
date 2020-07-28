@@ -1,28 +1,58 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+    <div id="app" class="container-fluid">
+
+        <header class="card-header row">
+            <div class="navbar-nav col-sm-6">
+              <router-link class="nav-item active" to="/list">Каталог</router-link>
+              <router-link class="nav-item" to="/settings" v-show="isAdmin">Настройка</router-link>
+              <router-link class="nav-item" to="/new" v-show="isAdmin">Добавить</router-link>
+            </div>
+
+            <div class="col-sm-6 text-right">
+                <button class="btn btn-info mr-2"
+                        @click="exportCatalogToPDF">
+                    Экспорт в PDF
+                </button>
+                <button class="btn btn-info"
+                        @click="changeMode">
+                    {{ isAdmin ? 'Выход' : 'Вход' }}
+                </button>
+            </div>
+        </header>
+
+        <main class="card-body container">
+          <router-view />
+        </main>
+
+        <footer class="card-footer row fixed-bottom">
+        </footer>
+
+    </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+    import { signOut } from './js/auth.js'
+    import mixin from './js/mixins.js'
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+    export default {
+        mixins: [mixin],
+
+        methods: {
+            changeMode() {
+                if (!this.isAdmin) {
+                    this.$router.push('/login')
+                } else {
+                    signOut()
+                }
+            },
+
+            exportCatalogToPDF() {
+                console.log('exportCatalogToPDF')
+            }
+        },
+    }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
