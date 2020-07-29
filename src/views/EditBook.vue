@@ -1,11 +1,7 @@
 <template>
     <div>
 
-        <div class="modal" v-if="isLoading">
-            <div class="spinner-border">
-                <p>Loading...</p>
-            </div>
-        </div>
+        <spinner v-if="isLoading"></spinner>
 
         <div v-else>
             <div class="text-right">
@@ -191,8 +187,15 @@
 <script>
     import { getDataFromDB, updateDocToDB, deleteDocToDB, getNewDocIdFromDB } from '../js/db.js'
     import { uploadImage } from '../js/storage.js';
+
+    import Spinner from '../components/Spinner.vue';
+
     export default {
         name: "Edit",
+
+        components: {
+            'spinner': Spinner
+        },
 
         data() {
             return {

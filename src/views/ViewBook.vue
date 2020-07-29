@@ -1,8 +1,7 @@
 <template>
     <div>
-        <div class="spinner-border" v-if="isLoading">
-            <p>Loading...</p>
-        </div>
+
+        <spinner v-if="isLoading"></spinner>
 
         <div class="row" v-else>
             <div class="col-sm-4">
@@ -30,10 +29,10 @@
                     </button>
                 </div>
 
-                <h3>{{bookParams.author}}</h3>
-                <h3>{{bookParams.title}}</h3>
+                <h4>{{bookParams.author}}</h4>
+                <h2>{{bookParams.title}}</h2>
 
-                <table class="table table-sm">
+                <table class="table table-bordered table-sm">
                     <tbody>
                         <tr>
                             <td>Вес в упаковке</td>
@@ -102,11 +101,16 @@
 <script>
     import { getDataFromDB } from "../js/db.js";
     import mixin from '../js/mixins.js';
+    import Spinner from '../components/Spinner.vue';
 
     export default {
         name: "ViewBook",
 
         mixins: [mixin],
+
+        components: {
+            'spinner': Spinner
+        },
 
         data() {
             return {
