@@ -39,13 +39,25 @@
                 </div>
             </div>
 
-           <!-- <div class="form-row mb-2">
-                <label for="bookCover" class="col-sm-2 col-form-label">Загрузить обложку</label>
+            <div class="form-row mb-2">
+                <label for="coverImg" class="col-sm-2 col-form-label">Обложка</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="bookCover"
-                           v-model="defaultParams.bookCover" />
+                    <input type="file" accept="image/*" id="coverImg" @change="loadCoverImg"/>
+                    <p>{{bookParams.coverImg.name}}</p>
                 </div>
-            </div>-->
+            </div>
+
+
+            <div class="form-row mb-2">
+                <label for="imgs" class="col-sm-2 col-form-label">Картинки</label>
+                <div class="col-sm-10">
+                    <input type="file" accept="image/*" id="imgs" multiple @change="loadImages"/>
+                    <div class="">
+                        <p v-for="img of bookParams.images" :key="img.name">{{img.name}}</p>
+                    </div>
+                </div>
+            </div>
+
 
             <div class="form-row mb-2">
                 <label for="weight" class="col-sm-2 col-form-label">Вес в упаковке</label>
@@ -61,15 +73,15 @@
                 <div class="col-sm">
                     <input type="number" class="form-control d-inline col-3 col-md-2" id="length"
                            placeholder="Длина"
-                           v-model="bookParams.size.length" />
+                           v-model="bookParams.size.l" />
 
                     <input type="number" class="form-control d-inline col-3 col-md-2"
                            placeholder="Ширина"
-                           v-model="bookParams.size.width" />
+                           v-model="bookParams.size.w" />
 
                     <input type="number" class="form-control d-inline col-3 col-md-2"
                            placeholder="Высота"
-                           v-model="bookParams.size.height" />
+                           v-model="bookParams.size.h" />
 
                     <span>мм</span>
                 </div>
@@ -177,8 +189,8 @@
 </template>
 
 <script>
-    import fb from 'firebase';
-
+    import { getDataFromDB, updateDocToDB, deleteDocToDB, getNewDocIdFromDB } from '../js/db.js'
+    import { uploadImage } from '../js/storage.js';
     export default {
         name: "Edit",
 
@@ -186,14 +198,17 @@
             return {
                 isLoading: false,
 
-                bookParams: {
+                bookParams: {},
+
+                defaultBookParams: {
+                    id: '',
                     title: '',
                     author: '',
                     weight: 0,
                     size: {
-                        length: 0,
-                        width: 0,
-                        height: 0
+                        l: 0,
+                        w: 0,
+                        h: 0
                     },
                     formatEdition: '',
                     ISBN: '',
@@ -207,6 +222,11 @@
                     language: '',
                     series: '',
                     description: '',
+                    coverImg: {
+                        name: '',
+                        url: ''
+                    },
+                    images: []
                 },
             }
         },
@@ -224,18 +244,13 @@
 
                     const bookIndex = +this.$route.params.id;
 
-                    fb.firestore().collection('catalog').where('index', '==', bookIndex)
-                        .get()
-                        .then((querySnapshot) => {
-                            querySnapshot.forEach((doc) => {
-                                const book = doc.data();
-
-                                this.bookParams = Object.assign({}, this.bookParams, book);
-
-                                this.isLoading = false;
-                            })
+                    getDataFromDB('catalog', 'index', '==', bookIndex)
+                        .then((res) => {
+                            this.bookParams = Object.assign({}, this.bookParams, res[0]);
+                            this.isLoading = false;
                         })
-                        .catch((err) => console.log(err))
+                } else {
+                    this.bookParams = Object.assign({}, this.bookParams, this.defaultBookParams)
                 }
             },
 
@@ -243,28 +258,40 @@
                 const path = this.$route.path;
 
                 if (path == '/new') {
-                    let newBookRef = fb.firestore().collection('catalog').doc();
-
-                    newBookRef.set(this.bookParams)
-                        .then(() => console.log('сохранено'))
-                        .catch(() => console.log('ошибка'))
-                } else {
-                    fb.firestore().collection('catalog').doc(this.bookParams.bookId)
-                        .update(this.bookParams)
-                        .then(() => console.log('изменено'))
-                        .catch(() => console.log('ошибка'))
+                    getNewDocIdFromDB('catalog')
+                        .then((res) => {
+                            console.log(res);
+                            this.bookParams.id = res;
+                        });
                 }
+
+                updateDocToDB('catalog', this.bookParams.id, this.bookParams)
             },
 
             onDelete() {
-                fb.firestore().collection('catalog').doc(this.bookParams.bookId)
-                    .delete()
-                    .then(() => console.log('книга удалена'))
-                    .catch(() => console.log('ошибка удаления'))
+                deleteDocToDB('catalog', this.bookParams.id)
             },
 
             onCancel() {
                 this.$router.go(-1);
+            },
+
+            loadCoverImg(event) {
+                let coverFile = event.target.files[0];
+
+                uploadImage(this.bookParams.id, coverFile.name, coverFile)
+                    .then((url) => {
+                        this.bookParams.coverImg = {
+                            url: url,
+                            name: coverFile.name
+                        };
+                    })
+            },
+
+            loadImages(event) {
+                let imageFiles = event.target.files;
+
+                console.log(imageFiles)
             }
         }
     }

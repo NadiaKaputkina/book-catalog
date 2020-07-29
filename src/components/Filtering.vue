@@ -44,9 +44,7 @@
             searchBooks(settingId, event) {
                 const value = event.target.value;
 
-                if (value.length > 2) {
-                    this.$emit('searchBooks', settingId, value)
-                }
+                this.$emit('searchBooks', settingId, value)
             }
         }
     }

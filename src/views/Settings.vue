@@ -9,19 +9,19 @@
 
         <div class="text-right" v-else>
             <div class="">
-                <button class="btn btn-success"
+                <button class="btn btn-success m-1"
                         v-if="isEditMode"
                         :disabled="isBtnDisabled"
                         @click.stop="onSave">
                     Сохранить
                 </button>
-                <button class="btn btn-warning"
+                <button class="btn btn-warning m-1"
                         v-if="isEditMode"
                         @click.stop="onCancel">
                     Отмена
                 </button>
                 
-                <button class="btn btn-info"
+                <button class="btn btn-info m-1"
                         v-if="!isEditMode"
                         @click="onEdit">
                     Редактировать
@@ -113,12 +113,11 @@
 
                 getAllDataFromDB('settings')
                     .then((result) => {
-                        console.log('kjhkjhkjhjgjgjhg')
                         this.settings = [...result];
 
                         this.sortByIndex(this.settings);
 
-                        this.startSettings = [...this.settings];
+                        this.startSettings = JSON.parse(JSON.stringify(this.settings));
                         this.isLoading = false;
                     })
             },
@@ -163,11 +162,7 @@
             },
 
             onCancel() {
-                this.settings = [];
-
-                this.startSettings.forEach(setting => {
-                    return this.settings.push(setting);
-                });
+                this.settings = JSON.parse(JSON.stringify(this.startSettings));
 
                 this.isEditMode = false;
             },

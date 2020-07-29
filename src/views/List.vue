@@ -1,5 +1,13 @@
 <template>
     <div class="catalog">
+
+        <div class="text-right">
+            <button class="btn btn-success m-1"
+                    @click="exportToPDF">
+                PDF
+            </button>
+        </div>
+
         <Filtering
             :filter-fields="filterFields"
             @searchBooks="searchBooksByValue"
@@ -45,8 +53,19 @@
       },
 
       computed: {
-          filteredBooksList: function () {
-              return this.booksList;
+          filteredBooksList: (vm) => {
+              /* let filteredList = [];
+
+              let settingValue = Object.entries(vm.filterParams);
+
+                  return vm.booksList;
+              } else {
+                  settingValue.forEach((param) => {
+                      filteredList.
+                  })
+              }*/
+
+              return vm.booksList
           }
       },
 
@@ -116,6 +135,10 @@
 
           searchBooksByValue(settingId, value) {
               this.$set(this.filterParams, settingId, value);
+          },
+
+          exportToPDF() {
+
           }
       },
 

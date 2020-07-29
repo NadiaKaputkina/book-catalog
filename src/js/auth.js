@@ -21,7 +21,10 @@ export const signIn = (login, password) => {
 };
 
 export const signOut = () => {
-    fb.auth().signOut()
-        .then(() => console.log('Выход выполнен'))
+    return fb.auth().signOut()
+        .then(() => {
+            console.log('Выход выполнен')
+            return Promise.resolve()
+        })
         .catch((err) => console.log('Ошибка выхода', err))
 };
