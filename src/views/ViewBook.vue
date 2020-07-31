@@ -1,18 +1,32 @@
 <template>
     <div>
 
-        <spinner v-if="isLoading"></spinner>
+        <modal v-if="isLoading">
+            <spinner text="загрузка"></spinner>
+        </modal>
 
         <div class="row" v-else>
             <div class="col-sm-4">
                 <img :src="bookParams.coverImg.url"
                      :alt="bookParams.coverImg.name"
-                     class="img-thumbnail"/>
-
+                     class="img-thumbnail"
+                     @click="showFullImgModal"/>
                 <div>
                     <img src=""/>
                 </div>
             </div>
+
+            <modal v-if="isShowFullImg">
+                <button>
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <img :src="bookParams.coverImg.url"
+                     :alt="bookParams.coverImg.name"
+                width="100vw"/>
+                <button>
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </modal>
 
             <div class="col-sm-8">
 
@@ -102,6 +116,7 @@
     import { getDataFromDB } from "../js/db.js";
     import mixin from '../js/mixins.js';
     import Spinner from '../components/Spinner.vue';
+    import Modal from '../components/Modal.vue';
 
     export default {
         name: "ViewBook",
@@ -109,12 +124,14 @@
         mixins: [mixin],
 
         components: {
-            'spinner': Spinner
+            'spinner': Spinner,
+            'modal': Modal
         },
 
         data() {
             return {
                 isLoading: false,
+                isShowFullImg: false,
 
                 bookParams: {},
                 isPublicParams: [],
@@ -160,6 +177,10 @@
 
             onEdit() {
                 this.$router.push(this.$route.path + '/edit')
+            },
+
+            showFullImgModal() {
+                this.isShowFullImg = true;
             }
         }
 

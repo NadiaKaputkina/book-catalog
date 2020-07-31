@@ -1,7 +1,12 @@
 <template>
     <div>
+        <modal v-if="isLoading">
+            <spinner text="загрузка"></spinner>
+        </modal>
 
-        <spinner v-if="isLoading"></spinner>
+        <modal v-if="isSaving">
+            <spinner text="сохранение"></spinner>
+        </modal>
 
         <div v-else>
             <div class="text-right">
@@ -185,22 +190,24 @@
 </template>
 
 <script>
-    import { getDataFromDB, updateDocToDB, deleteDocToDB, getNewDocIdFromDB } from '../js/db.js'
+    import { getDataFromDB, updateDocToDB, deleteDocToDB, getNewDocIdFromDB, addDocToDB } from '../js/db.js'
     import { uploadImage } from '../js/storage.js';
 
     import Spinner from '../components/Spinner.vue';
+    import Modal from '../components/Modal.vue';
 
     export default {
         name: "Edit",
 
         components: {
-            'spinner': Spinner
+            'spinner': Spinner,
+            'modal': Modal
         },
 
         data() {
             return {
                 isLoading: false,
-
+                isSaving: false,
                 bookParams: {},
 
                 defaultBookParams: {
@@ -231,6 +238,9 @@
                     },
                     images: []
                 },
+
+                coverFile: null,
+                files: [],
             }
         },
 
@@ -250,6 +260,7 @@
                     getDataFromDB('catalog', 'index', '==', bookIndex)
                         .then((res) => {
                             this.bookParams = Object.assign({}, this.bookParams, res[0]);
+
                             this.isLoading = false;
                         })
                 } else {
@@ -257,18 +268,36 @@
                 }
             },
 
-            onSave() {
+            async onSave() {
+                this.isSaving = true;
+
                 const path = this.$route.path;
 
                 if (path == '/new') {
-                    getNewDocIdFromDB('catalog')
-                        .then((res) => {
-                            console.log(res);
-                            this.bookParams.id = res;
-                        });
+                    this.bookParams.id = await getNewDocIdFromDB('catalog');
                 }
 
-                updateDocToDB('catalog', this.bookParams.id, this.bookParams)
+                this.bookParams.coverImg = {
+                    url: await uploadImage(this.bookParams.id, this.coverFile.name, this.coverFile),
+                    name: this.coverFile.name
+                };
+
+                for (let file of this.files) {
+                    this.bookParams.images.push({
+                        url: await uploadImage(this.bookParams.id, file.name, file),
+                        name: file.name
+                    });
+                }
+
+                if (path == '/new') {
+                    await addDocToDB('catalog', this.bookParams.id, this.bookParams);
+
+                    this.isSaving = false;
+                } else {
+                    await updateDocToDB('catalog', this.bookParams.id, this.bookParams)
+
+                    this.isSaving = false;
+                }
             },
 
             onDelete() {
@@ -280,21 +309,15 @@
             },
 
             loadCoverImg(event) {
-                let coverFile = event.target.files[0];
-
-                uploadImage(this.bookParams.id, coverFile.name, coverFile)
-                    .then((url) => {
-                        this.bookParams.coverImg = {
-                            url: url,
-                            name: coverFile.name
-                        };
-                    })
+                this.coverFile = event.target.files[0];
             },
 
             loadImages(event) {
                 let imageFiles = event.target.files;
 
-                console.log(imageFiles)
+                imageFiles.forEach(file => {
+                    this.files.push(file)
+                })
             }
         }
     }

@@ -6,21 +6,34 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     state: {
         isAdmin: false,
-        user: null
+        user: null,
+        settings: []
     },
 
     mutations: {
-        setUserAsAdmin (state) {
+        setUserAsAdmin(state) {
             state.isAdmin = true
         },
 
         setUser(state, user) {
-            state.isAdmin = false
+            state.isAdmin = false;
             if (!user) {
                 state.user = null
             } else {
                 state.user = user
             }
+        },
+
+        setSettings(state, settings) {
+            state.settings = settings
+        },
+
+        updateSetting(state, index, setting) {
+            state.settings.splice(index, 1, setting)
+        },
+
+        deleteSetting(state, index) {
+            state.settings.splice(index, 1)
         }
     }
 });

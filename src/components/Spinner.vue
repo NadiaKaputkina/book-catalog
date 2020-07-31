@@ -1,81 +1,66 @@
 <template>
-    <div class="custom-spinner">
-        <div class="sk-chase">
-            <div class="sk-chase-dot"></div>
-            <div class="sk-chase-dot"></div>
-            <div class="sk-chase-dot"></div>
-            <div class="sk-chase-dot"></div>
-            <div class="sk-chase-dot"></div>
-            <div class="sk-chase-dot"></div>
+    <div class="spinner-wrap">
+        <h3>{{text}}</h3>
+
+        <div class="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
         </div>
     </div>
-
 </template>
 
 <script>
     export default {
-        name: "Spinner"
+        name: "Spinner",
+
+        props: {
+            text: {
+                type: String,
+                default: ''
+            }
+        }
     }
 </script>
 
 <style scoped>
-    .custom-spinner {
-        position: absolute;
-        background-color: rgba(0,0,0,0.3);
+    .spinner {
+        width: auto;
         text-align: center;
     }
 
-    .sk-chase {
-        width: 40px;
-        height: 40px;
-        position: relative;
-        animation: sk-chase 2.5s infinite linear both;
-    }
-
-    .sk-chase-dot {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        left: 0;
-        top: 0;
-        animation: sk-chase-dot 2.0s infinite ease-in-out both;
-    }
-
-    .sk-chase-dot:before {
-        content: '';
-        display: block;
-        width: 25%;
-        height: 25%;
-        background-color: #fff;
+    .spinner > div {
+        margin: 0 5px;
+        width: 20px;
+        height: 20px;
+        background-color: #333;
         border-radius: 100%;
-        animation: sk-chase-dot-before 2.0s infinite ease-in-out both;
+        display: inline-block;
+        -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+        animation: sk-bouncedelay 1.4s infinite ease-in-out both;
     }
 
-    .sk-chase-dot:nth-child(1) { animation-delay: -1.1s; }
-    .sk-chase-dot:nth-child(2) { animation-delay: -1.0s; }
-    .sk-chase-dot:nth-child(3) { animation-delay: -0.9s; }
-    .sk-chase-dot:nth-child(4) { animation-delay: -0.8s; }
-    .sk-chase-dot:nth-child(5) { animation-delay: -0.7s; }
-    .sk-chase-dot:nth-child(6) { animation-delay: -0.6s; }
-    .sk-chase-dot:nth-child(1):before { animation-delay: -1.1s; }
-    .sk-chase-dot:nth-child(2):before { animation-delay: -1.0s; }
-    .sk-chase-dot:nth-child(3):before { animation-delay: -0.9s; }
-    .sk-chase-dot:nth-child(4):before { animation-delay: -0.8s; }
-    .sk-chase-dot:nth-child(5):before { animation-delay: -0.7s; }
-    .sk-chase-dot:nth-child(6):before { animation-delay: -0.6s; }
-
-    @keyframes sk-chase {
-        100% { transform: rotate(360deg); }
+    .spinner .bounce1 {
+        -webkit-animation-delay: -0.32s;
+        animation-delay: -0.32s;
     }
 
-    @keyframes sk-chase-dot {
-        80%, 100% { transform: rotate(360deg); }
+    .spinner .bounce2 {
+        -webkit-animation-delay: -0.16s;
+        animation-delay: -0.16s;
     }
 
-    @keyframes sk-chase-dot-before {
-        50% {
-            transform: scale(0.4);
-        } 100%, 0% {
+    @-webkit-keyframes sk-bouncedelay {
+        0%, 80%, 100% { -webkit-transform: scale(0) }
+        40% { -webkit-transform: scale(1.0) }
+    }
+
+    @keyframes sk-bouncedelay {
+        0%, 80%, 100% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        } 40% {
+              -webkit-transform: scale(1.0);
               transform: scale(1.0);
           }
     }

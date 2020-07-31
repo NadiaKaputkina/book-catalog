@@ -26,8 +26,6 @@
                     @click="signIn">
                 Войти
             </button>
-
-            <p>Регистрация</p>
         </div>
     </div>
 </template>

@@ -192,4 +192,8 @@
     .table td {
         padding: 0;
     }
+
+    input[type="checkbox"] {
+        background-color: #da2225;
+    }
 </style>

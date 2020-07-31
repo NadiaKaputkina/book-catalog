@@ -1,12 +1,58 @@
 import fb from 'firebase';
+import store from "../store";
 
-const db = fb.firestore();
+export const initDBListener = (collection) => {
+    let settings = [];
+
+    fb.firestore().collection(collection)
+        .onSnapshot(snapshot => {
+            snapshot.docChanges().forEach(change => {
+                const value = change.doc.data();
+
+                if (change.type === 'added') {
+                    settings.push(value)
+                }
+                if (change.type === 'modified') {
+                    console.log('[setting modified]', change.doc.id, value)
+                }
+                if (change.type === 'deleted') {
+                    console.log('[setting deleted]', change.doc.id, value)
+                }
+            });
+
+            store.commit('setSettings', settings)
+        })
+};
+
+
+/*
+fb.firestore().firestore().collection('catalog').onSnapshot(snapshot => {
+
+    snapshot.docChanges().forEach( change => {
+        const book = change.doc.data();
+
+        if (change.type === 'added') {
+            console.log('[added]', change.doc.id);
+            генерация PDF
+        }
+        if (change.type === 'modified') {
+            console.log('[modified]', change.doc.id)
+            удаление старой PDF
+            генерация новой PDF
+        }
+        if (change.type === 'deleted') {
+            console.log('[deleted]', change.doc.id)
+            удаление PDF
+        }
+    })
+});
+*/
 
 // GET doc or all docs
 export const getDataFromDB = (collection, field, operator, value) => {
     let result = [];
 
-    return db.collection(collection)
+    return fb.firestore().collection(collection)
         .where(field, operator, value)
         .get()
         .then((querySnapshot) => {
@@ -24,7 +70,7 @@ export const getDataFromDB = (collection, field, operator, value) => {
 export const getAllDataFromDB = (collection) => {
     let result = [];
 
-    return db.collection(collection)
+    return fb.firestore().collection(collection)
         .get()
         .then((querySnapshot) => {
 
@@ -40,17 +86,26 @@ export const getAllDataFromDB = (collection) => {
 };
 
 export const getNewDocIdFromDB = (collection) => {
-    return db.collection(collection)
-        .add({})
-        .then((doc) => {
-            return doc.id
-        })
-        .catch((err) => console.log('новый документ не создан', err))
+    return fb.firestore().collection(collection)
+        .doc()
+        .id
 };
 
 // ADD all docs
+export const addDocToDB = (collection, doc, value) => {
+    return fb.firestore().collection(collection)
+        .doc(doc)
+        .set(value)
+        .then(() => {
+            console.log('Данные записаны в базу');
+
+            return Promise.resolve()
+        })
+        .catch((err) => console.log('ошибка сохранения', err))
+};
+
 export const addDocsToDB = (collection, arr) => {
-    let batch = db.batch();
+    let batch = fb.firestore().batch();
 
     for (let value of arr) {
         let ref = fb.firestore().collection(collection).doc(value.id);
@@ -68,7 +123,7 @@ export const addDocsToDB = (collection, arr) => {
 
 // UPDATE
 export const updateDocToDB = (collection, doc, value) => {
-    db.collection(collection)
+    fb.firestore().collection(collection)
         .doc(doc)
         .update(value)
         .then(() => console.log('Данные обновлены'))
@@ -77,7 +132,7 @@ export const updateDocToDB = (collection, doc, value) => {
 
 // DELETE
 export const deleteDocToDB = (collection, doc) => {
-    db.collection(collection)
+    fb.firestore().collection(collection)
         .doc(doc)
         .delete()
         .then(() => console.log('Данные удалены'))
