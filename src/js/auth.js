@@ -24,6 +24,7 @@ export const signOut = () => {
     return fb.auth().signOut()
         .then(() => {
             console.log('Выход выполнен')
+
             return Promise.resolve()
         })
         .catch((err) => console.log('Ошибка выхода', err))

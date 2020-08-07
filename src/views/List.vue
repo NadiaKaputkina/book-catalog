@@ -34,6 +34,7 @@
 
   import mixin from '../js/mixins.js'
   import { getAllDataFromDB } from '../js/db.js'
+  import store from '../store'
 
   export default {
       name: 'List',
@@ -118,7 +119,13 @@
 
               getAllDataFromDB('catalog')
                   .then((res) => {
-                      this.booksList = Object.assign([], this.booksList, res)
+                      this.booksList = Object.assign([], this.booksList, res);
+
+                      this.booksList.forEach((book, index) => {
+                          book.index = index + 1;
+                      });
+
+                      store.commit('setCurrentBookId', this.booksList[0].id)
 
                       this.isLoading = false;
                   })

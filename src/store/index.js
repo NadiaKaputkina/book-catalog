@@ -7,7 +7,9 @@ const store = new Vuex.Store({
     state: {
         isAdmin: false,
         user: null,
-        settings: []
+        settings: [],
+
+        currentBookId: '',
     },
 
     mutations: {
@@ -25,6 +27,7 @@ const store = new Vuex.Store({
         },
 
         setSettings(state, settings) {
+            console.log('store => setSettings')
             state.settings = settings
         },
 
@@ -34,6 +37,10 @@ const store = new Vuex.Store({
 
         deleteSetting(state, index) {
             state.settings.splice(index, 1)
+        },
+
+        setCurrentBookId(state, id) {
+            state.currentBookId = id
         }
     }
 });

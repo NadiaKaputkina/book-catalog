@@ -5,9 +5,11 @@ import store from './store'
 import './public/bootstrap/bootstrap.css'
 
 import { initFirebase } from "./config/firebase.js";
-import { initDBListener } from "./js/db";
 import { initAuthListener } from './js/auth.js';
+import { getAllDataFromDB } from './js/db.js';
+
 import App from './App.vue'
+
 /*
 import { addDocsToDB } from './js/db.js';
 import { DEFAULT_SETTINGS } from './js/constants.js'
@@ -23,11 +25,14 @@ new Vue({
         initFirebase();
         initAuthListener();
 
-        initDBListener('settings')
-        /*
-        addDocsToDB('settings', DEFAULT_SETTINGS)
+        getAllDataFromDB('settings')
+            .then((res) => {
+                store.commit('setSettings', res)
+            })
+
+        /* addDocsToDB('settings', DEFAULT_SETTINGS)
             .then(() => console.log('setting добавлены'))
-            */
+        */
     },
 
 }).$mount('#app');

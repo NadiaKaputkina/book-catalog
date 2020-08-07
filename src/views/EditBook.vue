@@ -44,7 +44,7 @@
                 <label for="coverImg" class="col-sm-2 col-form-label">Обложка</label>
                 <div class="col-sm-10">
                     <input type="file" accept="image/*" id="coverImg" @change="loadCoverImg"/>
-                    <p>{{bookParams.coverImg.name}}</p>
+                    <p>{{getName(bookParams.coverImg)}}</p>
                 </div>
             </div>
 
@@ -53,8 +53,12 @@
                 <label for="imgs" class="col-sm-2 col-form-label">Картинки</label>
                 <div class="col-sm-10">
                     <input type="file" accept="image/*" id="imgs" multiple @change="loadImages"/>
-                    <div class="">
-                        <p v-for="img of bookParams.images" :key="img.name">{{img.name}}</p>
+
+                    <div v-for="(img, index) of bookParams.images" :key="img.name">
+                        {{img.name}}
+                        <button class="close text-danger" @click="deleteImage(index, img.name)">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -191,7 +195,7 @@
 
 <script>
     import { getDataFromDB, updateDocToDB, deleteDocToDB, getNewDocIdFromDB, addDocToDB } from '../js/db.js'
-    import { uploadImage } from '../js/storage.js';
+    import { uploadImage, deleteImage } from '../js/storage.js';
 
     import Spinner from '../components/Spinner.vue';
     import Modal from '../components/Modal.vue';
@@ -208,8 +212,8 @@
             return {
                 isLoading: false,
                 isSaving: false,
-                bookParams: {},
 
+                bookParams: {},
                 defaultBookParams: {
                     id: '',
                     title: '',
@@ -241,6 +245,8 @@
 
                 coverFile: null,
                 files: [],
+
+                deletedFiles: [],
             }
         },
 
@@ -248,8 +254,19 @@
             this.getBookParams();
         },
 
+        computed: {
+            getName: () => {
+                return (value) => {
+                    if (!value) {
+                        return ''
+                    }
+                    return value.name;
+                }
+            }
+        },
+
         methods: {
-            getBookParams() {
+            async getBookParams() {
                 const path = this.$route.path;
 
                 if (path !== '/new') {
@@ -265,6 +282,8 @@
                         })
                 } else {
                     this.bookParams = Object.assign({}, this.bookParams, this.defaultBookParams)
+
+                    this.bookParams.id = await getNewDocIdFromDB('catalog');
                 }
             },
 
@@ -273,20 +292,30 @@
 
                 const path = this.$route.path;
 
-                if (path == '/new') {
-                    this.bookParams.id = await getNewDocIdFromDB('catalog');
+                if (this.deletedFiles.length !== 0) {
+                    for (let file of this.deletedFiles) {
+                        deleteImage(this.bookParams.id, file.name)
+                            .then(() => {
+                                this.bookParams.images.splice(file.index, 1)
+                            })
+                    }
                 }
 
-                this.bookParams.coverImg = {
-                    url: await uploadImage(this.bookParams.id, this.coverFile.name, this.coverFile),
-                    name: this.coverFile.name
-                };
+                if (this.coverFile !== null) {
+                    this.bookParams.coverImg = {
+                        url: await uploadImage(this.bookParams.id, this.coverFile.name, this.coverFile),
+                        name: this.coverFile.name
+                    };
+                }
 
-                for (let file of this.files) {
-                    this.bookParams.images.push({
-                        url: await uploadImage(this.bookParams.id, file.name, file),
-                        name: file.name
-                    });
+                if(this.files.length !== 0) {
+                    for (let file of this.files) {
+                        console.log(file)
+                        this.bookParams.images.push({
+                            url: await uploadImage(this.bookParams.id, file.name, file),
+                            name: file.name
+                        });
+                    }
                 }
 
                 if (path == '/new') {
@@ -301,7 +330,12 @@
             },
 
             onDelete() {
-                deleteDocToDB('catalog', this.bookParams.id)
+                deleteDocToDB('catalog', this.bookParams.id);
+
+                deleteImage(this.bookParams.id, 'all')
+                    .then(() =>
+                        this.$router.push('/list')
+                    )
             },
 
             onCancel() {
@@ -318,6 +352,20 @@
                 imageFiles.forEach(file => {
                     this.files.push(file)
                 })
+            },
+
+            deleteImage(index, fileName) {
+                console.log(index, fileName)
+                const path = this.$route.path;
+
+                if (path == '/new') {
+                    this.files.splice(index, 1)
+                } else {
+                    this.deletedFiles.push({
+                        index: index,
+                        name: fileName
+                    });
+                }
             }
         }
     }

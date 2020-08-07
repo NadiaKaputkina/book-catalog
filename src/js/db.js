@@ -1,7 +1,8 @@
 import fb from 'firebase';
-import store from "../store";
 
-export const initDBListener = (collection) => {
+/*
+export const initSettingsListener = (collection) => {
+    console.log('initSettingsListener');
     let settings = [];
 
     fb.firestore().collection(collection)
@@ -19,11 +20,12 @@ export const initDBListener = (collection) => {
                     console.log('[setting deleted]', change.doc.id, value)
                 }
             });
-
             store.commit('setSettings', settings)
+           )
         })
 };
 
+*/
 
 /*
 fb.firestore().firestore().collection('catalog').onSnapshot(snapshot => {
@@ -48,7 +50,6 @@ fb.firestore().firestore().collection('catalog').onSnapshot(snapshot => {
 });
 */
 
-// GET doc or all docs
 export const getDataFromDB = (collection, field, operator, value) => {
     let result = [];
 
