@@ -4,8 +4,18 @@
             <spinner text="загрузка"></spinner>
         </modal>
 
-        <modal v-if="isSaving">
+        <modal v-else-if="isSaving">
             <spinner text="сохранение"></spinner>
+        </modal>
+
+        <modal v-else-if="isDeleting">
+            <div class="bg-white">
+                <p>Удалить все данные и картинки для этой книги?</p>
+                <button class="btn btn-success"
+                        @click="onDelete">Да</button>
+                <button class="btn btn-warning"
+                        @click="isDeleting = false">Нет</button>
+            </div>
         </modal>
 
         <div v-else>
@@ -15,7 +25,7 @@
                     Сохранить
                 </button>
                 <button class="btn btn-danger m-1"
-                        @click="onDelete">
+                        @click="isDeleting = true">
                     Удалить
                 </button>
                 <button class="btn btn-warning m-1"
@@ -56,9 +66,9 @@
 
                     <div v-for="(img, index) of bookParams.images" :key="img.name">
                         {{img.name}}
-                        <button class="close text-danger" @click="deleteImage(index, img.name)">
+                        <span class="close text-danger" @click="deleteImage(index, img.name)">
                             <span aria-hidden="true">&times;</span>
-                        </button>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -199,9 +209,12 @@
 
     import Spinner from '../components/Spinner.vue';
     import Modal from '../components/Modal.vue';
+    import mixin from '../js/mixins.js'
 
     export default {
         name: "Edit",
+
+        mixins: [mixin],
 
         components: {
             'spinner': Spinner,
@@ -212,6 +225,7 @@
             return {
                 isLoading: false,
                 isSaving: false,
+                isDeleting: false,
 
                 bookParams: {},
                 defaultBookParams: {
@@ -272,9 +286,7 @@
                 if (path !== '/new') {
                     this.isLoading = true;
 
-                    const bookIndex = +this.$route.params.id;
-
-                    getDataFromDB('catalog', 'index', '==', bookIndex)
+                    getDataFromDB('catalog', 'id', '==', this.currentBookId)
                         .then((res) => {
                             this.bookParams = Object.assign({}, this.bookParams, res[0]);
 
@@ -294,7 +306,7 @@
 
                 if (this.deletedFiles.length !== 0) {
                     for (let file of this.deletedFiles) {
-                        deleteImage(this.bookParams.id, file.name)
+                        await deleteImage(this.bookParams.id, file.name)
                             .then(() => {
                                 this.bookParams.images.splice(file.index, 1)
                             })
@@ -321,11 +333,17 @@
                 if (path == '/new') {
                     await addDocToDB('catalog', this.bookParams.id, this.bookParams);
 
+                    this.clear();
                     this.isSaving = false;
-                } else {
-                    await updateDocToDB('catalog', this.bookParams.id, this.bookParams)
 
+                    this.$router.push('/list/' + this.$route.params.id)
+                } else {
+                    await updateDocToDB('catalog', this.bookParams.id, this.bookParams);
+
+                    this.clear();
                     this.isSaving = false;
+
+                    this.$router.push('/list/' + this.$route.params.id)
                 }
             },
 
@@ -333,9 +351,11 @@
                 deleteDocToDB('catalog', this.bookParams.id);
 
                 deleteImage(this.bookParams.id, 'all')
-                    .then(() =>
+                    .then(() => {
                         this.$router.push('/list')
-                    )
+
+                        this.isDeleting = false
+                    })
             },
 
             onCancel() {
@@ -355,7 +375,6 @@
             },
 
             deleteImage(index, fileName) {
-                console.log(index, fileName)
                 const path = this.$route.path;
 
                 if (path == '/new') {
@@ -366,6 +385,12 @@
                         name: fileName
                     });
                 }
+            },
+
+            clear() {
+                this.files = [];
+                this.coverFile = null;
+                this.deletedFiles = [];
             }
         }
     }

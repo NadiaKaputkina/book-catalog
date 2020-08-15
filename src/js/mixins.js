@@ -1,6 +1,8 @@
 const mixin = {
     computed: {
         isAdmin: (vm) => vm.$store.state.isAdmin,
+
+        currentBookId: (vm) => vm.$store.state.currentBookId,
     },
 
     methods: {

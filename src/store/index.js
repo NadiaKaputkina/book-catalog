@@ -14,10 +14,12 @@ const store = new Vuex.Store({
 
     mutations: {
         setUserAsAdmin(state) {
+            console.log('store => setUserAsAdmin')
             state.isAdmin = true
         },
 
         setUser(state, user) {
+            console.log('store => setUser')
             state.isAdmin = false;
             if (!user) {
                 state.user = null
@@ -32,16 +34,19 @@ const store = new Vuex.Store({
         },
 
         updateSetting(state, index, setting) {
+            console.log('store => updateSetting')
             state.settings.splice(index, 1, setting)
         },
 
         deleteSetting(state, index) {
+            console.log('store => deleteSetting')
             state.settings.splice(index, 1)
         },
 
         setCurrentBookId(state, id) {
+            console.log('store => setCurrentBookId', id)
             state.currentBookId = id
-        }
+        },
     }
 });
 
