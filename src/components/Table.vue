@@ -16,10 +16,9 @@
                         {{book[col.id]}}
                     </td>
                     <td class="col-1" v-if="isAdmin">
-                        <button class="btn btn-info"
-                              @click.stop="editBook(book.index, book.id)">
-                            /
-                        </button>
+                         <div @click.stop="editBook(book.index, book.id)">
+                            <font-awesome-icon icon="edit" size='2x'/>
+                        </div>
                     </td>
                 </tr>
             </tbody>

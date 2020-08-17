@@ -44,16 +44,8 @@
             <div class="col-sm-6">
 
                 <div class="text-right">
-                    <button class="btn btn-success m-1"
-                            @click="exportToPDF">
-                        PDF
-                    </button>
-
-                    <button class="btn btn-info m-1"
-                            v-if="isAdmin"
-                            @click="onEdit">
-                        Редактировать
-                    </button>
+                    <font-awesome-icon icon="file-pdf" size='2x' @click="exportToPDF"/>
+                    <font-awesome-icon icon="edit" size='2x' v-if="isAdmin" @click="onEdit"/>
                 </div>
 
                 <h4>{{bookParams.author}}</h4>

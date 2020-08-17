@@ -5,16 +5,14 @@
         </modal>
 
         <div v-else>
-            <div class="text-right">
-                <button class="btn btn-success m-1"
-                        @click="exportToPDF">
-                    PDF
-                </button>
+            <div class="text-right"
+                @click="exportToPDF">
+                <font-awesome-icon icon="file-pdf" size='2x' />
             </div>
 
             <filtering
                 :filter-fields="filterFields"
-                @searchBooks="searchBooksByValue"
+                @searchParams="setSearchParams"
             ></filtering>
 
             <Table
@@ -54,7 +52,7 @@
 
               booksList: [],
 
-              filterParams: {}
+              searchParams: {}
           }
       },
 
@@ -94,18 +92,28 @@
           },
 
           filteredBooksList: (vm) => {
-              /* let filteredList = [];
-
-              let settingValue = Object.entries(vm.filterParams);
-
+              let searchValues = Object.entries(vm.searchParams);
+console.log(searchValues)
+              if (searchValues.length == 0) {
                   return vm.booksList;
               } else {
-                  settingValue.forEach((param) => {
-                      filteredList.
-                  })
-              }*/
+                  return vm.booksList.filter((book) => {
+                      return searchValues.every(([prop, searchValue]) => {
+                          let bookParam = book[prop]
 
-              return vm.booksList
+                          if (typeof bookParam == 'string') {
+                              console.log(bookParam)
+                                  bookParam = bookParam.toLowerCase()
+                                  searchValue = searchValue.toLowerCase()
+
+                                  return bookParam.includes(searchValue)
+                          }
+                    
+                        return bookParam == searchValue
+                    
+                      })
+                  })
+              }
           }
       },
 
@@ -131,8 +139,8 @@
                   })
           },
 
-          searchBooksByValue(settingId, value) {
-              this.$set(this.filterParams, settingId, value);
+          setSearchParams(value) {
+              this.searchParams = {...value}
           },
 
           exportToPDF() {
