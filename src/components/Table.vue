@@ -3,6 +3,7 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr class="row">
+                    <th>#</th>
                     <th class="col" v-for="col of tableColumns" :key="col.id">{{col.text}}</th>
                     <th class="col-1" v-if="isAdmin"></th>
                 </tr>
@@ -10,14 +11,14 @@
             <tbody>
                 <tr class="row" v-for="book of books" :key="book.title"
                     @click="viewBook(book.index, book.id)">
+                    <th>{{book.index}}</th>
                     <td class="col" v-for="col of tableColumns" :key="book.title + '_' + col.id">
                         {{book[col.id]}}
                     </td>
                     <td class="col-1" v-if="isAdmin">
-                        <button class="btn btn-info"
-                              @click.stop="editBook(book.index, book.id)">
-                            /
-                        </button>
+                         <div @click.stop="editBook(book.index, book.id)">
+                            <font-awesome-icon icon="edit" size='2x'/>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -29,6 +30,8 @@
 </template>
 
 <script>
+    import store from '../store';
+
     export default {
         name: "Table",
 
@@ -54,12 +57,20 @@
         },
 
         methods: {
-            viewBook(bookIndex) {
-                this.$router.push(`/list/${bookIndex}`);
+            setCurrentBookId(id) {
+                store.commit('setCurrentBookId', id)
             },
 
-            editBook(bookIndex) {
-                this.$router.push(`/list/${bookIndex}/edit`);
+            viewBook(index, id) {
+                this.setCurrentBookId(id);
+
+                this.$router.push(`/list/${index}`);
+            },
+
+            editBook(index, id) {
+                this.setCurrentBookId(id);
+
+                this.$router.push(`/list/${index}/edit`);
             }
         }
     }

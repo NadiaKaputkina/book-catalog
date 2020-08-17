@@ -11,8 +11,8 @@ const firebaseConfig = {
     measurementId: "G-4K3RYVK5H0"
 };
 
-const initFirebase = () => {
+export const initFirebase = () => {
+
+    console.log('initFirebase')
     fb.initializeApp(firebaseConfig);
 };
-
-export default initFirebase;

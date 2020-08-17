@@ -1,121 +1,150 @@
 <template>
-    <div class="catalog">
-        <Filtering
-            :filter-fields="filterFields"
-            @searchBooks="searchBooksByValue"
-        ></Filtering>
+    <div>
+        <modal v-if="isLoading">
+            <spinner></spinner>
+        </modal>
 
-        <Table
-            :isAdmin="isAdmin"
-            :books="filteredBooksList"
-            :table-columns="tableColumns"
-        ></Table>
+        <div v-else>
+            <div class="text-right"
+                @click="exportToPDF">
+                <font-awesome-icon icon="file-pdf" size='2x' />
+            </div>
+
+            <filtering
+                :filter-fields="filterFields"
+                @searchParams="setSearchParams"
+            ></filtering>
+
+            <Table
+                :isAdmin="isAdmin"
+                :books="filteredBooksList"
+                :table-columns="tableColumns"
+            ></Table>
+        </div>
     </div>
 </template>
 
 <script>
-
   import Filtering from '../components/Filtering.vue'
   import Table from '../components/Table.vue'
+  import Modal from '../components/Modal.vue'
+  import Spinner from '../components/Spinner.vue';
 
   import mixin from '../js/mixins.js'
-
-  import fb from 'firebase';
+  import { getAllDataFromDB } from '../js/db.js'
+  import store from '../store'
 
   export default {
       name: 'List',
 
-      components: {
-          Filtering,
-          Table
-      },
-
       mixins: [mixin],
+
+      components: {
+          'filtering': Filtering,
+          'Table': Table,
+          'spinner': Spinner,
+          'modal': Modal
+      },
 
       data() {
           return {
+              isLoading: false,
+
               booksList: [],
-              allSettings: [],
 
-              tableColumns: [],
-              filterFields: [],
-
-              filterParams: {}
+              searchParams: {}
           }
       },
 
       computed: {
-          filteredBooksList: function () {
-              return this.booksList;
+          tableColumns: (vm) => {
+              let columns = [];
+              let settings = vm.$store.state.settings;
+
+              if (settings.length !== 0) {
+                  settings.forEach(setting => {
+                      if (setting.isShowInTable) {
+                          return columns.push(setting)
+                      }
+                  });
+
+                  vm.sortByIndex(columns);
+              }
+
+              return columns;
+          },
+
+          filterFields: (vm) => {
+              let fields = [];
+              let settings = vm.$store.state.settings;
+
+              if (settings.length !== 0) {
+                  settings.forEach(setting => {
+                      if (setting.isFilterable) {
+                          return fields.push(setting)
+                      }
+                  });
+
+                  vm.sortByIndex(fields);
+              }
+
+              return fields;
+          },
+
+          filteredBooksList: (vm) => {
+              let searchValues = Object.entries(vm.searchParams);
+console.log(searchValues)
+              if (searchValues.length == 0) {
+                  return vm.booksList;
+              } else {
+                  return vm.booksList.filter((book) => {
+                      return searchValues.every(([prop, searchValue]) => {
+                          let bookParam = book[prop]
+
+                          if (typeof bookParam == 'string') {
+                              console.log(bookParam)
+                                  bookParam = bookParam.toLowerCase()
+                                  searchValue = searchValue.toLowerCase()
+
+                                  return bookParam.includes(searchValue)
+                          }
+                    
+                        return bookParam == searchValue
+                    
+                      })
+                  })
+              }
           }
       },
 
       created() {
-          fb.firestore().collection('catalog').onSnapshot(snapshot => {
-
-              snapshot.docChanges().forEach( change => {
-                  const book = change.doc.data();
-
-                  if (change.type === 'added') {
-                      //console.log('[book added]', change.doc.id);
-                      this.booksList.push(book)
-                  }
-                  if (change.type === 'modified') {
-                      console.log('[book modified]', change.doc.id)
-                      //this.booksList.push(book)
-                  }
-                  if (change.type === 'deleted') {
-                      console.log('[book deleted]', change.doc.id)
-                      //this.booksList.push(book)
-                  }
-              })
-          });
-
-          fb.firestore().collection('settings')
-              .onSnapshot(snapshot => {
-                  snapshot.docChanges().forEach( change => {
-                      const setting = change.doc.data();
-
-                      if (change.type === 'added') {
-                         // console.log('[setting added]', change.doc.id)
-                          this.allSettings.push(setting)
-                      }
-                      if (change.type === 'modified') {
-                          console.log('[setting modified]', change.doc.id)
-                      }
-                      if (change.type === 'deleted') {
-                          console.log('[setting deleted]', change.doc.id)
-                      }
-                  });
-
-                  this.getTableColumns();
-                  this.getFilterFields();
-              })
+          this.getData();
       },
 
       methods: {
-          getTableColumns() {
-              this.allSettings.forEach(setting => {
-                  if (setting.isShowInTable) {
-                      return this.tableColumns.push(setting)
-                  }
-              });
+          getData() {
+              this.isLoading = true;
 
-              this.sortByIndex(this.tableColumns)
+              getAllDataFromDB('catalog')
+                  .then((res) => {
+                      this.booksList = Object.assign([], this.booksList, res);
+
+                      this.booksList.forEach((book, index) => {
+                          book.index = index + 1;
+                      });
+
+                      store.commit('setCurrentBookId', this.booksList[0].id)
+
+                      this.isLoading = false;
+                  })
           },
 
-          getFilterFields() {
-              this.allSettings.forEach(setting => {
-                  if (setting.isFilterable) {
-                      return this.filterFields.push(setting)
-                  }
-              });
-
-              this.sortByIndex(this.filterFields)
+          setSearchParams(value) {
+              this.searchParams = {...value}
           },
 
-          searchBooksByValue(settingId, value) {
-              this.$set(this.filterParams, settingId, value);
+          exportToPDF() {
+
           }
       },
 

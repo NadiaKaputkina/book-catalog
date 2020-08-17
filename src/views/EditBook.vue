@@ -1,11 +1,22 @@
 <template>
     <div>
+        <modal v-if="isLoading">
+            <spinner text="загрузка"></spinner>
+        </modal>
 
-        <div class="modal" v-if="isLoading">
-            <div class="spinner-border">
-                <p>Loading...</p>
+        <modal v-else-if="isSaving">
+            <spinner text="сохранение"></spinner>
+        </modal>
+
+        <modal v-else-if="isDeleting">
+            <div class="bg-white">
+                <p>Удалить все данные и картинки для этой книги?</p>
+                <button class="btn btn-success"
+                        @click="onDelete">Да</button>
+                <button class="btn btn-warning"
+                        @click="isDeleting = false">Нет</button>
             </div>
-        </div>
+        </modal>
 
         <div v-else>
             <div class="text-right">
@@ -14,7 +25,7 @@
                     Сохранить
                 </button>
                 <button class="btn btn-danger m-1"
-                        @click="onDelete">
+                        @click="isDeleting = true">
                     Удалить
                 </button>
                 <button class="btn btn-warning m-1"
@@ -39,13 +50,29 @@
                 </div>
             </div>
 
-           <!-- <div class="form-row mb-2">
-                <label for="bookCover" class="col-sm-2 col-form-label">Загрузить обложку</label>
+            <div class="form-row mb-2">
+                <label for="coverImg" class="col-sm-2 col-form-label">Обложка</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="bookCover"
-                           v-model="defaultParams.bookCover" />
+                    <input type="file" accept="image/*" id="coverImg" @change="loadCoverImg"/>
+                    <p>{{getName(bookParams.coverImg)}}</p>
                 </div>
-            </div>-->
+            </div>
+
+
+            <div class="form-row mb-2">
+                <label for="imgs" class="col-sm-2 col-form-label">Картинки</label>
+                <div class="col-sm-10">
+                    <input type="file" accept="image/*" id="imgs" multiple @change="loadImages"/>
+
+                    <div v-for="(img, index) of bookParams.images" :key="img.name">
+                        {{img.name}}
+                        <span class="close text-danger" @click="deleteImage(index, img.name)">
+                            <span aria-hidden="true">&times;</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
 
             <div class="form-row mb-2">
                 <label for="weight" class="col-sm-2 col-form-label">Вес в упаковке</label>
@@ -61,15 +88,15 @@
                 <div class="col-sm">
                     <input type="number" class="form-control d-inline col-3 col-md-2" id="length"
                            placeholder="Длина"
-                           v-model="bookParams.size.length" />
+                           v-model="bookParams.size.l" />
 
                     <input type="number" class="form-control d-inline col-3 col-md-2"
                            placeholder="Ширина"
-                           v-model="bookParams.size.width" />
+                           v-model="bookParams.size.w" />
 
                     <input type="number" class="form-control d-inline col-3 col-md-2"
                            placeholder="Высота"
-                           v-model="bookParams.size.height" />
+                           v-model="bookParams.size.h" />
 
                     <span>мм</span>
                 </div>
@@ -177,23 +204,39 @@
 </template>
 
 <script>
-    import fb from 'firebase';
+    import { getDataFromDB, updateDocToDB, deleteDocToDB, getNewDocIdFromDB, addDocToDB } from '../js/db.js'
+    import { uploadImage, deleteImage } from '../js/storage.js';
+
+    import Spinner from '../components/Spinner.vue';
+    import Modal from '../components/Modal.vue';
+    import mixin from '../js/mixins.js'
 
     export default {
         name: "Edit",
 
+        mixins: [mixin],
+
+        components: {
+            'spinner': Spinner,
+            'modal': Modal
+        },
+
         data() {
             return {
                 isLoading: false,
+                isSaving: false,
+                isDeleting: false,
 
-                bookParams: {
+                bookParams: {},
+                defaultBookParams: {
+                    id: '',
                     title: '',
                     author: '',
                     weight: 0,
                     size: {
-                        length: 0,
-                        width: 0,
-                        height: 0
+                        l: 0,
+                        w: 0,
+                        h: 0
                     },
                     formatEdition: '',
                     ISBN: '',
@@ -207,7 +250,17 @@
                     language: '',
                     series: '',
                     description: '',
+                    coverImg: {
+                        name: '',
+                        url: ''
+                    },
+                    images: []
                 },
+
+                coverFile: null,
+                files: [],
+
+                deletedFiles: [],
             }
         },
 
@@ -215,56 +268,129 @@
             this.getBookParams();
         },
 
+        computed: {
+            getName: () => {
+                return (value) => {
+                    if (!value) {
+                        return ''
+                    }
+                    return value.name;
+                }
+            }
+        },
+
         methods: {
-            getBookParams() {
+            async getBookParams() {
                 const path = this.$route.path;
 
                 if (path !== '/new') {
                     this.isLoading = true;
 
-                    const bookIndex = +this.$route.params.id;
+                    getDataFromDB('catalog', 'id', '==', this.currentBookId)
+                        .then((res) => {
+                            this.bookParams = Object.assign({}, this.bookParams, res[0]);
 
-                    fb.firestore().collection('catalog').where('index', '==', bookIndex)
-                        .get()
-                        .then((querySnapshot) => {
-                            querySnapshot.forEach((doc) => {
-                                const book = doc.data();
-
-                                this.bookParams = Object.assign({}, this.bookParams, book);
-
-                                this.isLoading = false;
-                            })
+                            this.isLoading = false;
                         })
-                        .catch((err) => console.log(err))
+                } else {
+                    this.bookParams = Object.assign({}, this.bookParams, this.defaultBookParams)
+
+                    this.bookParams.id = await getNewDocIdFromDB('catalog');
                 }
             },
 
-            onSave() {
+            async onSave() {
+                this.isSaving = true;
+
                 const path = this.$route.path;
 
-                if (path == '/new') {
-                    let newBookRef = fb.firestore().collection('catalog').doc();
+                if (this.deletedFiles.length !== 0) {
+                    for (let file of this.deletedFiles) {
+                        await deleteImage(this.bookParams.id, file.name)
+                            .then(() => {
+                                this.bookParams.images.splice(file.index, 1)
+                            })
+                    }
+                }
 
-                    newBookRef.set(this.bookParams)
-                        .then(() => console.log('сохранено'))
-                        .catch(() => console.log('ошибка'))
+                if (this.coverFile !== null) {
+                    this.bookParams.coverImg = {
+                        url: await uploadImage(this.bookParams.id, this.coverFile.name, this.coverFile),
+                        name: this.coverFile.name
+                    };
+                }
+
+                if(this.files.length !== 0) {
+                    for (let file of this.files) {
+                        console.log(file)
+                        this.bookParams.images.push({
+                            url: await uploadImage(this.bookParams.id, file.name, file),
+                            name: file.name
+                        });
+                    }
+                }
+
+                if (path == '/new') {
+                    await addDocToDB('catalog', this.bookParams.id, this.bookParams);
+
+                    this.clear();
+                    this.isSaving = false;
+
+                    this.$router.push('/list/' + this.$route.params.id)
                 } else {
-                    fb.firestore().collection('catalog').doc(this.bookParams.bookId)
-                        .update(this.bookParams)
-                        .then(() => console.log('изменено'))
-                        .catch(() => console.log('ошибка'))
+                    await updateDocToDB('catalog', this.bookParams.id, this.bookParams);
+
+                    this.clear();
+                    this.isSaving = false;
+
+                    this.$router.push('/list/' + this.$route.params.id)
                 }
             },
 
             onDelete() {
-                fb.firestore().collection('catalog').doc(this.bookParams.bookId)
-                    .delete()
-                    .then(() => console.log('книга удалена'))
-                    .catch(() => console.log('ошибка удаления'))
+                deleteDocToDB('catalog', this.bookParams.id);
+
+                deleteImage(this.bookParams.id, 'all')
+                    .then(() => {
+                        this.$router.push('/list')
+
+                        this.isDeleting = false
+                    })
             },
 
             onCancel() {
                 this.$router.go(-1);
+            },
+
+            loadCoverImg(event) {
+                this.coverFile = event.target.files[0];
+            },
+
+            loadImages(event) {
+                let imageFiles = event.target.files;
+
+                imageFiles.forEach(file => {
+                    this.files.push(file)
+                })
+            },
+
+            deleteImage(index, fileName) {
+                const path = this.$route.path;
+
+                if (path == '/new') {
+                    this.files.splice(index, 1)
+                } else {
+                    this.deletedFiles.push({
+                        index: index,
+                        name: fileName
+                    });
+                }
+            },
+
+            clear() {
+                this.files = [];
+                this.coverFile = null;
+                this.deletedFiles = [];
             }
         }
     }

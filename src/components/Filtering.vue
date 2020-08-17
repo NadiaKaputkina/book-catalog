@@ -1,14 +1,18 @@
 <template>
     <div class="row flex-nowrap mb-2 justify-content-center">
         <input class="form-control m-1"
-               :class="'col-' + colSize"
+               :class="'col-' + colSize(field.id)"
                v-for="field of filterFields"
                :key="field.id"
                :type="inputType(field.id)"
                :ref="field.id"
                :placeholder="field.text"
-               @input="searchBooks(field.id, $event)"
+               @input="onSetSearchParams(field.id, $event)"
         />
+
+         <span @click="onSearch">
+            <font-awesome-icon icon="search" size='2x' />
+        </span>
     </div>
 </template>
 
@@ -27,26 +31,41 @@
             }
         },
 
+        data() {
+            return {
+                searchParams: {}
+            }
+        },
+
         computed: {
             inputType: () => {
                 return (settingId) => {
-                    return INPUT_TYPE_NUMBER.includes(settingId) ? 'number' : 'text';
+                    return INPUT_TYPE_NUMBER.includes(settingId) ? 'number' : 'search';
                 }
             },
 
-            colSize: function () {
-                const fieldsCount = this.filterFields.length;
-                return Math.floor(12 / fieldsCount);
+            colSize: () => {
+                return (settingId) => {
+                    if (INPUT_TYPE_NUMBER.includes(settingId)) {
+                        return 1;
+                    } else {
+                        //const fieldsCount = this.filterFields.length;
+
+                        return 2;
+                    }
+                }
             }
         },
 
         methods: {
-            searchBooks(settingId, event) {
+            onSearch() {
+                this.$emit('searchParams', this.searchParams)
+            },
+
+            onSetSearchParams(settingId, event) {
                 const value = event.target.value;
 
-                if (value.length > 2) {
-                    this.$emit('searchBooks', settingId, value)
-                }
+                this.$set(this.searchParams, settingId, value);
             }
         }
     }

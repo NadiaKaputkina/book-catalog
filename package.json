@@ -5,11 +5,16 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "deploy": "sh deploy.sh"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@fortawesome/vue-fontawesome": "^0.1.10",
     "core-js": "^3.6.5",
     "firebase": "^7.16.1",
+    "jspdf": "^2.0.0",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuex": "^3.5.1"

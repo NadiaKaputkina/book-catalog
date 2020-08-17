@@ -26,8 +26,6 @@
                     @click="signIn">
                 Войти
             </button>
-
-            <p>Регистрация</p>
         </div>
     </div>
 </template>
@@ -40,8 +38,8 @@
 
         data() {
             return {
-                login: '',
-                password: '',
+                login: 'welcom-n@mail.ru',
+                password: 'admin1',
 
                 isValidPass: true,
                 isValidLogin: true,

@@ -1,23 +1,22 @@
 <template>
-    <div id="app" class="container-fluid">
+    <div id="app">
 
-        <header class="card-header row">
-            <div class="navbar-nav col-sm-6">
-              <router-link class="nav-item active" to="/list">Каталог</router-link>
-              <router-link class="nav-item" to="/settings" v-show="isAdmin">Настройка</router-link>
-              <router-link class="nav-item" to="/new" v-show="isAdmin">Добавить</router-link>
-            </div>
+        <header class="card-header row justify-content-between">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <router-link class="nav-link" to="/list">Каталог</router-link>
+                </li>
+                <li class="nav-item" v-show="isAdmin">
+                    <router-link class="nav-link" to="/settings">Настройка</router-link>
+                </li>
+                <li class="nav-item" v-show="isAdmin">
+                    <router-link class="nav-link" to="/new">Добавить</router-link>
+                </li>
+            </ul>
 
-            <div class="col-sm-6 text-right">
-                <button class="btn btn-info mr-2"
-                        @click="exportCatalogToPDF">
-                    Экспорт в PDF
-                </button>
-                <button class="btn btn-info"
-                        @click="changeMode">
-                    {{ isAdmin ? 'Выход' : 'Вход' }}
-                </button>
-            </div>
+            <span @click="changeMode">
+                <font-awesome-icon :icon="isAdmin ? 'sign-out-alt' : 'sign-in-alt'" size='2x'/>
+            </span>
         </header>
 
         <main class="card-body container">
@@ -43,11 +42,10 @@
                     this.$router.push('/login')
                 } else {
                     signOut()
+                        .then(() => {
+                            this.$router.push('/list')
+                        })
                 }
-            },
-
-            exportCatalogToPDF() {
-                console.log('exportCatalogToPDF')
             }
         },
     }
