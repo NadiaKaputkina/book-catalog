@@ -33,7 +33,7 @@
 
                     <img class="rounded mx-auto d-block"
                         :src="getUrl(listImages[currentImgIndex])"
-                         :alt="getName(listImages[currentImgIndex])"/>
+                        :alt="getName(listImages[currentImgIndex])"/>
                 </div>
 
                 <a class="carousel-control-next" @click="showImage(1)">
@@ -44,8 +44,12 @@
             <div class="col-sm-6">
 
                 <div class="text-right">
-                    <font-awesome-icon icon="file-pdf" size='2x' @click="exportToPDF"/>
-                    <font-awesome-icon icon="edit" size='2x' v-if="isAdmin" @click="onEdit"/>
+                    <span @click="exportToPDF">
+                        <font-awesome-icon icon="file-pdf" size='2x' />
+                    </span>
+                    <span @click="onEdit">
+                        <font-awesome-icon icon="edit" size='2x' v-if="isAdmin" />
+                    </span>
                 </div>
 
                 <h4>{{bookParams.author}}</h4>

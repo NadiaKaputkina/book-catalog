@@ -8,7 +8,7 @@
                     <th class="col-1" v-if="isAdmin"></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody ref="tableRef">
                 <tr class="row" v-for="book of books" :key="book.title"
                     @click="viewBook(book.index, book.id)">
                     <th>{{book.index}}</th>
@@ -16,9 +16,9 @@
                         {{book[col.id]}}
                     </td>
                     <td class="col-1" v-if="isAdmin">
-                         <div @click.stop="editBook(book.index, book.id)">
+                         <span @click="editBook(book.index, book.id)">
                             <font-awesome-icon icon="edit" size='2x'/>
-                        </div>
+                        </span>
                     </td>
                 </tr>
             </tbody>

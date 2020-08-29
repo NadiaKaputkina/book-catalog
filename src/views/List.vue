@@ -5,17 +5,16 @@
         </modal>
 
         <div v-else>
-            <div class="text-right"
-                @click="exportToPDF">
+            <span @click="exportToPDF">
                 <font-awesome-icon icon="file-pdf" size='2x' />
-            </div>
+            </span>
 
             <filtering
                 :filter-fields="filterFields"
                 @searchParams="setSearchParams"
             ></filtering>
 
-            <Table
+            <Table ref='table'
                 :isAdmin="isAdmin"
                 :books="filteredBooksList"
                 :table-columns="tableColumns"
@@ -32,6 +31,7 @@
 
   import mixin from '../js/mixins.js'
   import { getAllDataFromDB } from '../js/db.js'
+  import { createPDFList } from '../js/pdf.js'
   import store from '../store'
 
   export default {
@@ -144,6 +144,9 @@ console.log(searchValues)
           },
 
           exportToPDF() {
+              createPDFList(this.$refs.table.$refs.tableRef, 'catalog')
+
+              console.log(this.$refs.table.$refs.tableRef)
 
           }
       },

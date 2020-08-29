@@ -21,17 +21,15 @@
                     Отмена
                 </button>
                 
-                <button class="btn btn-info m-1"
-                        v-if="!isEditMode"
-                        @click="onEdit">
-                    Редактировать
-                </button>
+                <span v-if="!isEditMode" @click="onEdit">
+                    <font-awesome-icon icon="edit" size='2x' v-if="isAdmin" />
+                </span>
             </div>
 
             <table class="table table-hover">
                 <thead>
                     <tr class="row">
-                        <th class="col-4 text-center">Название свойства</th>
+                        <th class="col-4 text-center">Свойство</th>
                         <th class="col-2 text-center">Публичное</th>
                         <th class="col-2 text-center">В таблице</th>
                         <th class="col-2 text-center">В фильтре</th>
@@ -45,19 +43,19 @@
                                    v-model="setting.text"/>
                             <p v-else class="text-left px-3 py-2 mb-0">{{setting.text}}</p>
                         </td>
-                        <td class="col-2 text-center">
+                        <td class="col-1 text-center">
                             <input type="checkbox"
                                    :checked="setting.isPublic"
                                    @change="changeChecked($event, setting.id, 'isPublic')"
                                    :disabled="!isEditMode"/>
                         </td>
-                        <td class="col-2 text-center">
+                        <td class="col-1 text-center">
                             <input type="checkbox"
                                    :checked="setting.isShowInTable"
                                    @change="changeChecked($event, setting.id, 'isShowInTable')"
                                    :disabled="!isEditMode || !setting.isPublic"/>
                         </td>
-                        <td class="col-2 text-center">
+                        <td class="col-1 text-center">
                             <input type="checkbox"
                                    :checked="setting.isFilterable"
                                    @change="changeChecked($event, setting.id, 'isFilterable')"
@@ -67,7 +65,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="row">
-                        <td class="col">+</td>
+                        <td class="col"></td>
                     </tr>
                 </tfoot>
             </table>
