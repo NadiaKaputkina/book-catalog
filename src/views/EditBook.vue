@@ -19,18 +19,21 @@
         </modal>
 
         <div v-else>
-            <div class="text-right">
-                <button class="btn btn-success m-1"
+            <div class="text-right my-3">
+                <button class="btn btn-outline-secondary mr-2"
                         @click="onSave">
-                    Сохранить
+                    <i class="icon-save"></i>
+                    <span class="d-none d-sm-inline">Сохранить</span>
                 </button>
-                <button class="btn btn-danger m-1"
+                <button class="btn btn-outline-secondary mr-2"
                         @click="isDeleting = true">
-                    Удалить
+                    <i class="icon-delete"></i>
+                    <span class="d-none d-sm-inline">Удалить</span>
                 </button>
-                <button class="btn btn-warning m-1"
+                <button class="btn btn-outline-secondary mr-2"
                         @click="onCancel">
-                    Отмена
+                    <i class="icon-cancel"></i>
+                    <span class="d-none d-sm-inline">Отмена</span>
                 </button>
             </div>
 

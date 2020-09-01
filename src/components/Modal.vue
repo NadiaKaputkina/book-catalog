@@ -22,7 +22,7 @@
         right: 0;
         margin: 0;
         padding: 0;
-        background-color: rgba(0,0,0,0.3);
+        background-color: rgba(0,0,0,0.4);
         z-index: 1100;
         opacity: 1;
         visibility: visible;

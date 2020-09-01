@@ -1,24 +1,27 @@
 <template>
-    <div>
+    <div class="p-3">
 
         <modal v-if="isLoading">
             <spinner text="загрузка"></spinner>
         </modal>
 
         <div class="row" v-else>
-            <div class="col-sm-6" @click="showFullImgModal">
-                <img :src="getUrl(bookParams.coverImg)"
-                     :alt="getName(bookParams.coverImg)"
-                     class="img-fluid"/>
+            <div class="col-md-6 col-lx-4 p-0"
+                 @click="showFullImgModal">
+                <div class="row">
+                    <img :src="getUrl(bookParams.coverImg)"
+                         :alt="getName(bookParams.coverImg)"
+                         :width="'100%'"
+                         class="col-8"/>
 
-                <div>
-                    <img v-for="img of bookParams.images"
-                         :width="'25%'"
-                         :key="getUrl(img)"
-                         :src="getUrl(img)"
-                         :alt="getName(img)"/>
+                    <div class="col-4 col-md-4 pl-0">
+                        <img v-for="img of bookParams.images"
+                             :width="'100%'"
+                             :key="getUrl(img)"
+                             :src="getUrl(img)"
+                             :alt="getName(img)"/>
+                    </div>
                 </div>
-
             </div>
 
             <modal v-if="isShowAllImg">
@@ -41,19 +44,24 @@
                 </a>
             </modal>
 
-            <div class="col-sm-6">
+            <div class="col-md-6 pr-0">
 
-                <div class="text-right">
-                    <span @click="exportToPDF">
-                        <font-awesome-icon icon="file-pdf" size='2x' />
-                    </span>
-                    <span @click="onEdit">
-                        <font-awesome-icon icon="edit" size='2x' v-if="isAdmin" />
-                    </span>
+                <div class="row m-0">
+                    <h3 class="col p-0">{{bookParams.title}}</h3>
+                    <div class="">
+                        <span v-if="isAdmin"
+                              class="ml-auto mr-2"
+                              @click="editBook(book.index, book.id)">
+                            <i class="icon-pdf"></i>
+                        </span>
+                        <span class=""
+                              @click="openPDF(book.id)">
+                            <i class="icon-edit"></i>
+                        </span>
+                    </div>
                 </div>
 
                 <h4>{{bookParams.author}}</h4>
-                <h2>{{bookParams.title}}</h2>
 
                 <table class="table table-bordered table-sm">
                     <tbody>
@@ -113,9 +121,10 @@
                 </table>
             </div>
 
-            <div class="col" v-if="isPublic('description')">
-                {{bookParams.description}}
-            </div>
+
+        </div>
+        <div class="row" v-if="isPublic('description')">
+            {{bookParams.description}}
         </div>
 
     </div>    
@@ -260,12 +269,12 @@
 
 <style scoped>
     .custom-modal > div {
-        max-width: 90%;
-        max-height: 90%;
+        width: 100%;
+        height: 100%;
     }
 
     .custom-modal > div > img {
         width: auto;
-        height: auto;
+        max-height: 80vh;
     }
 </style>
