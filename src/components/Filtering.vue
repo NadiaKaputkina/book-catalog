@@ -1,7 +1,6 @@
 <template>
-    <div class="row flex-nowrap mb-2 justify-content-center">
-        <input class="form-control m-1"
-               :class="'col-' + colSize(field.id)"
+    <div class="row mb-2 px-3">
+        <input class="col form-control m-1"
                v-for="field of filterFields"
                :key="field.id"
                :type="inputType(field.id)"
@@ -10,9 +9,10 @@
                @input="onSetSearchParams(field.id, $event)"
         />
 
-         <span @click="onSearch">
-            <font-awesome-icon icon="search" size='2x' />
-        </span>
+         <button class="btn"
+            @click="onSearch">
+            <i class="fas fa-search"></i>
+         </button>
     </div>
 </template>
 
@@ -41,18 +41,6 @@
             inputType: () => {
                 return (settingId) => {
                     return INPUT_TYPE_NUMBER.includes(settingId) ? 'number' : 'search';
-                }
-            },
-
-            colSize: () => {
-                return (settingId) => {
-                    if (INPUT_TYPE_NUMBER.includes(settingId)) {
-                        return 1;
-                    } else {
-                        //const fieldsCount = this.filterFields.length;
-
-                        return 2;
-                    }
                 }
             }
         },

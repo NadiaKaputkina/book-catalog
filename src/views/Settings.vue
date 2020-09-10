@@ -7,70 +7,60 @@
             </div>
         </div>
 
-        <div class="text-right" v-else>
-            <div class="">
-                <button class="btn btn-success m-1"
+        <div v-else>
+            <div class="text-right my-3">
+                <span v-if="!isEditMode" @click="onEdit">
+                    <i class="fas fa-edit"></i>
+                </span>
+                <button class="btn btn-outline-secondary mr-2"
                         v-if="isEditMode"
                         :disabled="isBtnDisabled"
-                        @click.stop="onSave">
-                    Сохранить
+                        @click="onSave">
+                    <i class="fas fa-save"></i>
+                    <span class="d-none d-sm-inline ml-2">Сохранить</span>
                 </button>
-                <button class="btn btn-warning m-1"
+                <button class="btn btn-outline-secondary mr-2"
                         v-if="isEditMode"
-                        @click.stop="onCancel">
-                    Отмена
+                        @click="onCancel">
+                    <i class="fas fa-times"></i>
+                    <span class="d-none d-sm-inline ml-2">Отмена</span>
                 </button>
-                
-                <span v-if="!isEditMode" @click="onEdit">
-                    <font-awesome-icon icon="edit" size='2x' v-if="isAdmin" />
-                </span>
             </div>
 
-            <table class="table table-hover">
-                <thead>
-                    <tr class="row">
-                        <th class="col-4 text-center">Свойство</th>
-                        <th class="col-2 text-center">Публичное</th>
-                        <th class="col-2 text-center">В таблице</th>
-                        <th class="col-2 text-center">В фильтре</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="row" v-for="setting of settings" :key="setting.id">
-                        <td class="col-4">
-                            <input type="text" v-if="isEditMode"
-                                   class="form-control"
-                                   v-model="setting.text"/>
-                            <p v-else class="text-left px-3 py-2 mb-0">{{setting.text}}</p>
-                        </td>
-                        <td class="col-1 text-center">
-                            <input type="checkbox"
-                                   :checked="setting.isPublic"
-                                   @change="changeChecked($event, setting.id, 'isPublic')"
-                                   :disabled="!isEditMode"/>
-                        </td>
-                        <td class="col-1 text-center">
-                            <input type="checkbox"
-                                   :checked="setting.isShowInTable"
-                                   @change="changeChecked($event, setting.id, 'isShowInTable')"
-                                   :disabled="!isEditMode || !setting.isPublic"/>
-                        </td>
-                        <td class="col-1 text-center">
-                            <input type="checkbox"
-                                   :checked="setting.isFilterable"
-                                   @change="changeChecked($event, setting.id, 'isFilterable')"
-                                   :disabled="!isEditMode || !setting.isShowInTable"/>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="row">
-                        <td class="col"></td>
-                    </tr>
-                </tfoot>
-            </table>
+            <div class="row">
+                <div class="col-6 col-sm-5 col-md-4 col-lg-3 col-lx-2">Свойство</div>
+                <div class="col-1">Публичное</div>
+                <div class="col-1">В таблице</div>
+                <div class="col-1">В фильтре</div>
+            </div>
+    
+            <div class="row mb-1" v-for="setting of settings" :key="setting.id">
+                <div class="col-6 col-sm-5 col-md-4 col-lg-3 col-lx-2">
+                    <input type="text" v-if="isEditMode"
+                            class="form-control"
+                            v-model="setting.text"/>
+                    <p v-else class="text-left px-3 py-2 mb-0">{{setting.text}}</p>
+                </div>
+                <div class="col-1 text-center">
+                    <input type="checkbox"
+                            :checked="setting.isPublic"
+                            @change="changeChecked($event, setting.id, 'isPublic')"
+                            :disabled="!isEditMode"/>
+                </div>
+                <div class="col-1 text-center">
+                    <input type="checkbox"
+                            :checked="setting.isShowInTable"
+                            @change="changeChecked($event, setting.id, 'isShowInTable')"
+                            :disabled="!isEditMode || !setting.isPublic"/>
+                </div>
+                <div class="col-1 text-center">
+                    <input type="checkbox"
+                            :checked="setting.isFilterable"
+                            @change="changeChecked($event, setting.id, 'isFilterable')"
+                            :disabled="!isEditMode || !setting.isShowInTable"/>
+                </div>
+            </div>
         </div>
-        
     </div>
 </template>
 
@@ -185,13 +175,3 @@
         }
     }
 </script>
-
-<style scoped>
-    .table td {
-        padding: 0;
-    }
-
-    input[type="checkbox"] {
-        background-color: #da2225;
-    }
-</style>

@@ -11,8 +11,7 @@
                 <div class="row">
                     <img :src="getUrl(bookParams.coverImg)"
                          :alt="getName(bookParams.coverImg)"
-                         :width="'100%'"
-                         class="col-8"/>
+                         class="col-8 img-fluid"/>
 
                     <div class="col-4 col-md-4 pl-0">
                         <img v-for="img of bookParams.images"
@@ -25,38 +24,37 @@
             </div>
 
             <modal v-if="isShowAllImg">
-                <a class="carousel-control-prev" @click="showImage(-1)">
-                    <span class="carousel-control-prev-icon"></span>
-                </a>
-
                 <div class="d-flex align-items-center flex-column">
-                    <button class="btn bg-transparent border-light text-white mb-3" @click="closeModal">
+                    <a class="carousel-control-prev" @click="showImage(-1)">
+                        <span class="carousel-control-prev-icon"></span>
+                    </a>
+
+                    <button class="btn bg-transparent text-white my-3" @click="closeModal">
                         Закрыть
                     </button>
 
                     <img class="rounded mx-auto d-block"
                         :src="getUrl(listImages[currentImgIndex])"
                         :alt="getName(listImages[currentImgIndex])"/>
-                </div>
 
-                <a class="carousel-control-next" @click="showImage(1)">
-                    <span class="carousel-control-next-icon"></span>
-                </a>
+                    <a class="carousel-control-next" @click="showImage(1)">
+                        <span class="carousel-control-next-icon"></span>
+                    </a>
+                </div>
             </modal>
 
             <div class="col-md-6 pr-0">
 
                 <div class="row m-0">
                     <h3 class="col p-0">{{bookParams.title}}</h3>
-                    <div class="">
+                    <div>
                         <span v-if="isAdmin"
                               class="ml-auto mr-2"
-                              @click="editBook(book.index, book.id)">
-                            <i class="icon-pdf"></i>
+                              @click="editBook">
+                            <i class="fas fa-edit"></i>
                         </span>
-                        <span class=""
-                              @click="openPDF(book.id)">
-                            <i class="icon-edit"></i>
+                        <span @click="openPDF(book.id)">
+                            <i class="fas fa-file-pdf"></i>
                         </span>
                     </div>
                 </div>
@@ -169,8 +167,9 @@
 
             getUrl: () => {
                 return (value) => {
+                    console.log(value)
                     if(!value) {
-                        return '@/assets/logo.png'
+                        return '@/assets/noimg.jpg'
                     }
                     return value.url;
                 }
@@ -232,11 +231,11 @@
                 }
             },
 
-            exportToPDF() {
-
+            openPDF() {
+                console.log('open PDF')
             },
 
-            onEdit() {
+            editBook() {
                 this.$router.push(this.$route.path + '/edit')
             },
 

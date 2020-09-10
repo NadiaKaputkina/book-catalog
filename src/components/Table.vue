@@ -7,23 +7,23 @@
             <div class="col-8 col-sm-9 col-md-10 pr-0">
                 <div class="row m-0">
                     <h4 class="col p-0" @click="viewBook(book.index, book.id)">{{book.title}}</h4>
-                    <div class="">
+                    <div class="ml-auto">
                         <span v-if="isAdmin"
-                              class="ml-auto mr-2"
+                              class="mr-2"
                               @click="editBook(book.index, book.id)">
-                            <i class="icon-pdf"></i>
+                            <i class="fas fa-edit"></i>
                         </span>
                         <span class=""
                             @click="openPDF(book.id)">
-                            <i class="icon-edit"></i>
+                            <i class="fas fa-file-pdf"></i>
                         </span>
                     </div>
                 </div>
                 <div class="row m-0">
                     <p>{{book.author}}, {{book.yearOfIssue}}</p>
                 </div>
-                <div class="row m-0">
-                    <p class="overflow-hidden">{{book.description}}</p>
+                <div class="row m-0 h-50 overflow-hidden">
+                    <p class="">{{book.description}}</p>
                 </div>
             </div>
         </div>
@@ -73,7 +73,11 @@
                 this.setCurrentBookId(id);
 
                 this.$router.push(`/list/${index}/edit`);
-            }
+            },
+
+            openPDF(id) {
+                console.log('open PDF', id)
+            },
         }
     }
 </script>

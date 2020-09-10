@@ -22,18 +22,18 @@
             <div class="text-right my-3">
                 <button class="btn btn-outline-secondary mr-2"
                         @click="onSave">
-                    <i class="icon-save"></i>
-                    <span class="d-none d-sm-inline">Сохранить</span>
+                    <i class="fas fa-save"></i>
+                    <span class="d-none d-sm-inline ml-2">Сохранить</span>
                 </button>
                 <button class="btn btn-outline-secondary mr-2"
                         @click="isDeleting = true">
-                    <i class="icon-delete"></i>
-                    <span class="d-none d-sm-inline">Удалить</span>
+                    <i class="far fa-trash-alt"></i>
+                    <span class="d-none d-sm-inline ml-2">Удалить</span>
                 </button>
                 <button class="btn btn-outline-secondary mr-2"
                         @click="onCancel">
-                    <i class="icon-cancel"></i>
-                    <span class="d-none d-sm-inline">Отмена</span>
+                    <i class="fas fa-times"></i>
+                    <span class="d-none d-sm-inline ml-2">Отмена</span>
                 </button>
             </div>
 
@@ -69,8 +69,8 @@
 
                     <div v-for="(img, index) of bookParams.images" :key="img.name">
                         {{img.name}}
-                        <span class="close text-danger" @click="deleteImage(index, img.name)">
-                            <span aria-hidden="true">&times;</span>
+                        <span class="text-danger" @click="deleteImage(index, img.name)">
+                            <i class="fas fa-close"></i>
                         </span>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                 <div class="col-sm-10">
                     <input type="number" class="form-control d-inline col-3 col-md-2" id="weight"
                            v-model="bookParams.weight" />
-                    <span>грамм</span>
+                    <span class="ml-2">грамм</span>
                 </div>
             </div>
 
@@ -93,15 +93,15 @@
                            placeholder="Длина"
                            v-model="bookParams.size.l" />
 
-                    <input type="number" class="form-control d-inline col-3 col-md-2"
+                    <input type="number" class="form-control d-inline col-3 col-md-2 ml-2"
                            placeholder="Ширина"
                            v-model="bookParams.size.w" />
 
-                    <input type="number" class="form-control d-inline col-3 col-md-2"
+                    <input type="number" class="form-control d-inline col-3 col-md-2 ml-2"
                            placeholder="Высота"
                            v-model="bookParams.size.h" />
 
-                    <span>мм</span>
+                    <span class="ml-2">мм</span>
                 </div>
             </div>
 

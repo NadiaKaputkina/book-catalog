@@ -4,11 +4,7 @@
             <spinner></spinner>
         </modal>
 
-        <div v-else>
-            <span @click="exportToPDF">
-                <font-awesome-icon icon="file-pdf" size='2x' />
-            </span>
-
+        <div class="my-3 mx-0 mx-sm-1 mx-md-2 mx-lg-3" v-else>
             <filtering
                 :filter-fields="filterFields"
                 @searchParams="setSearchParams"
@@ -31,7 +27,6 @@
 
   import mixin from '../js/mixins.js'
   import { getAllDataFromDB } from '../js/db.js'
-  import { createPDFList } from '../js/pdf.js'
   import store from '../store'
 
   export default {
@@ -93,7 +88,7 @@
 
           filteredBooksList: (vm) => {
               let searchValues = Object.entries(vm.searchParams);
-console.log(searchValues)
+
               if (searchValues.length == 0) {
                   return vm.booksList;
               } else {
@@ -142,13 +137,6 @@ console.log(searchValues)
           setSearchParams(value) {
               this.searchParams = {...value}
           },
-
-          exportToPDF() {
-              createPDFList(this.$refs.table.$refs.tableRef, 'catalog')
-
-              console.log(this.$refs.table.$refs.tableRef)
-
-          }
       },
 
 

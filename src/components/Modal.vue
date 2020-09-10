@@ -22,9 +22,8 @@
         right: 0;
         margin: 0;
         padding: 0;
-        background-color: rgba(0,0,0,0.4);
+        background-color: rgba(0,0,0,0.6);
         z-index: 1100;
-        opacity: 1;
         visibility: visible;
         -webkit-transition: opacity 0.4s ease-in-out 0s;
         transition: opacity 0.4s ease-in-out 0s;
