@@ -1,73 +1,47 @@
+@import "./GothamProRegular.css";
+
+:root {
+    --white: #ffffff;
+    --black: #000000;
+
+    --gray-1: #222222;
+    --gray-2: #656565;
+    --gray-3: #a0a0a0;
+    --gray-4: #e0e0e0;
+    --gray-5: #f2f2f2;
+
+    --green-1: #008329;
+    --green-2: #37a000;
+    --green-3: #a4dd83;
+    --green-4: #ebf7ec;
+    
+    --form-shadow: 0 1px 6px rgba(57, 73, 76, .35);
+    --input-shadow: insert 0 0 5px rgba(0, 0, 0, .3);
+}
+
 body {
-    font-family: Helvetica, sans-serif;
+    font-family: "GothamProRegular", sans-serif;
     font-size: inherit;
     font-weight: normal;
-    color: #1b1e21;
+    color: var(--gray-1);
+    background-color: var(--gray-5);
 }
 
 /*-- header --*/
 .nav {
-    background-color: rgba(128, 92, 6, 0.05);
-    padding: 10px;
-    min-height: 50px;
-}
-.nav .nav-item .nav-link {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: rgba(128, 0, 0, 0.7);
-}
-.nav .nav-item .nav-link:hover {
-    color: rgba(128, 0, 0, 1);
-    box-shadow: 0 2px 0 0 rgba(128, 0, 0, 1);
+    background-color: var(--white);
+    box-shadow: var(--form-shadow);
 }
 
-
-/*-- table --*/
-.table {
-    color: inherit;
-}
-.table > .row:nth-child(odd) {
-    background-color: rgba(128, 92, 6, 0.05);
-}
-.table img.img-thumbnail {
-    border: 0;
-    padding: 0;
+/* -- main -- */
+.page-content { 
+    background-color: var(--white);
+    box-shadow: var(--form-shadow);
 }
 
-.table p {
-    max-height: 20px;
-}
+/* -- footer -- */
 
-.table h4 {
-    font-size: 1.3rem;
-    color: rgba(128, 0, 0, 0.7);
-    font-weight: bold;
-}
-.table h4:hover {
-    color: rgba(128, 0, 0, 1);
-    text-decoration-line: underline;
-}
 
-.table div:last-child > p {
-    color: ;
-}
-
-.fas, .far {
-    font-size: 1.5rem;
-}
-span .fas, span .far {
-    color: rgba(85, 58, 58, 0.7);
-}
-
-span:hover .fas,
-span:hover .far {
-    color: rgba(128, 0, 0, 1);
-}
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    width: 30px;
-    height: 30px;
-}
 @media (max-width: 1200px) {
     html {
         font-size: 16px;
@@ -83,9 +57,6 @@ span:hover .far {
 @media (max-width: 768px) {
     html {
         font-size: 14px;
-    }
-    h4 {
-        font-size: 1.1em;
     }
 }
 

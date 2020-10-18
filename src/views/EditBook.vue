@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="row">
         <modal v-if="isLoading">
             <spinner text="загрузка"></spinner>
         </modal>
@@ -18,8 +18,8 @@
             </div>
         </modal>
 
-        <div v-else>
-            <div class="text-right my-3">
+        <div v-else class="page-content col-12 col-md-10 offset-md-1 col-xl-8 offset-xl-2 p-4 my-2 my-md-4">
+            <div class="text-right">
                 <button class="btn btn-outline-secondary mr-2"
                         @click="onSave">
                     <i class="fas fa-save"></i>

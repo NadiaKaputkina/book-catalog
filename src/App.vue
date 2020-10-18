@@ -2,7 +2,7 @@
     <div id="app">
 
         <header class="header">
-            <ul class="nav">
+            <ul class="nav px-2 px-md-4 py-2">
                 <li class="nav-item">
                     <router-link class="nav-link" to="/list">
                         <i class="fas fa-list"></i>
@@ -36,7 +36,7 @@
             </ul>
         </header>
 
-        <main class="container-fluid">
+        <main class="container-fluid" ref="refContent">
           <router-view />
         </main>
 
@@ -49,6 +49,7 @@
 <script>
     import { signOut } from './js/auth.js'
     import mixin from './js/mixins.js'
+    import { createPDFList } from './js/pdf.js'
 
     export default {
         mixins: [mixin],
@@ -67,6 +68,8 @@
 
             openPDF() {
                 console.log('open PDF')
+
+                createPDFList(this.$refs.refContent);
             },
         },
     }

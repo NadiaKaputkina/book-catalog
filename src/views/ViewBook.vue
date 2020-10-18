@@ -8,7 +8,7 @@
         <div class="row" v-else>
             <div class="col-md-6 col-lx-4 p-0"
                  @click="showFullImgModal">
-                <div class="row">
+                <div id="bookImages" class="row">
                     <img :src="getUrl(bookParams.coverImg)"
                          :alt="getName(bookParams.coverImg)"
                          class="col-8 img-fluid"/>
@@ -46,24 +46,24 @@
             <div class="col-md-6 pr-0">
 
                 <div class="row m-0">
-                    <h3 class="col p-0">{{bookParams.title}}</h3>
+                    <h3 id="bookTitle" class="col p-0">{{bookParams.title}}</h3>
                     <div>
                         <span v-if="isAdmin"
                               class="ml-auto mr-2"
                               @click="editBook">
                             <i class="fas fa-edit"></i>
                         </span>
-                        <span @click="openPDF(book.id)">
+                        <span @click="openPDF(bookParams.title, listImages)">
                             <i class="fas fa-file-pdf"></i>
                         </span>
                     </div>
                 </div>
 
-                <h4>{{bookParams.author}}</h4>
+                <h4 id="bookAuthor">{{bookParams.author}}</h4>
 
-                <table class="table table-bordered table-sm">
+                <table id="bookTable" class="table table-bordered table-sm">
                     <tbody>
-                        <tr v-if="isPublic('weight')">
+                        <tr v-if="isPublic('weight')" class="bookDescription">
                             <td>Вес в упаковке</td>
                             <td>{{bookParams.weight}}</td>
                         </tr>
@@ -121,7 +121,7 @@
 
 
         </div>
-        <div class="row" v-if="isPublic('description')">
+        <div id="bookDescription" class="row" v-if="isPublic('description')">
             {{bookParams.description}}
         </div>
 
@@ -130,6 +130,7 @@
 
 <script>
     import { getDataFromDB } from "../js/db.js";
+    import { createPDF } from "../js/pdf.js";
     import mixin from '../js/mixins.js';
     import Spinner from '../components/Spinner.vue';
     import Modal from '../components/Modal.vue';
@@ -167,7 +168,6 @@
 
             getUrl: () => {
                 return (value) => {
-                    console.log(value)
                     if(!value) {
                         return '@/assets/noimg.jpg'
                     }
@@ -213,7 +213,7 @@
                     getDataFromDB('catalog', 'id', '==', id)
                         .then((res) => {
                             this.bookParams = Object.assign({}, this.bookParams, res[0]);
-
+                            this.listImages = [this.bookParams.coverImg, ...this.bookParams.images];
                             this.isLoading = false;
                         })
                 }
@@ -231,8 +231,8 @@
                 }
             },
 
-            openPDF() {
-                console.log('open PDF')
+            openPDF(fileName, listImages) {
+                createPDF(fileName, listImages)
             },
 
             editBook() {
